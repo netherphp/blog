@@ -1,0 +1,222 @@
+<?php
+
+namespace Nether\Blog;
+
+use Nether\Atlantis;
+use Nether\Common;
+use Nether\Database;
+use Nether\User;
+
+use Exception;
+
+#[Database\Meta\TableClass('Blogs', 'BL')]
+class Blog
+extends Database\Prototype {
+
+	#[Database\Meta\TypeIntBig(Unsigned: TRUE, AutoInc: TRUE)]
+	#[Database\Meta\PrimaryKey]
+	public int
+	$ID;
+
+	#[Database\Meta\TypeChar(Size: 36)]
+	public string
+	$UUID;
+
+	#[Database\Meta\TypeChar(Size: 64, Variable: TRUE)]
+	public string
+	$Alias;
+
+	#[Database\Meta\TypeChar(Size: 64, Variable: TRUE)]
+	public string
+	$Title;
+
+	#[Database\Meta\TypeChar(Size: 64, Variable: TRUE)]
+	public string
+	$Tagline;
+
+	#[Database\Meta\TypeChar(Size: 64, Variable: TRUE)]
+	public string
+	$Details;
+
+	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: NULL)]
+	public int
+	$ImageHeaderID;
+
+	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: NULL)]
+	public int
+	$ImageHeaderURL;
+
+	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: NULL)]
+	public int
+	$ImageIconID;
+
+	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: NULL)]
+	public int
+	$ImageIconURL;
+
+	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: 0)]
+	public int
+	$TimeCreated;
+
+	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: 0)]
+	public int
+	$TimeUpdated;
+
+	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: 0)]
+	public int
+	$CountPosts;
+
+	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: 0)]
+	public int
+	$CountViews;
+
+	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: 0)]
+	public int
+	$CountComments;
+
+	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: 0)]
+	public int
+	$CountImages;
+
+	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: 0)]
+	public int
+	$CountCodeBlocks;
+
+	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: 0)]
+	public int
+	$CountReadingTime;
+
+	#[Database\Meta\TypeIntTiny(Unsigned: TRUE, Default: 0)]
+	public int
+	$OptAdult;
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
+	protected function
+	OnReady(Common\Prototype\ConstructArgs $Args):
+	void {
+
+		return;
+	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
+	public function
+	GetRecentPosts(int $Page=1):
+	Database\Struct\PrototypeFindResult {
+
+		return Post::Find([
+			'BlogID' => $this->ID,
+			'Page'   => $Page,
+			'Sort'   => 'newest'
+		]);
+	}
+
+	public function
+	GetURL():
+	string {
+
+		$Format = '/+:BlogAlias:';
+
+		$Tokens = [
+			':BlogID:'    => $this->ID,
+			':BlogAlias:' => $this->Alias
+		];
+
+		$Output = $Format;
+		$Token = NULL;
+		$Value = NULL;
+
+		foreach($Tokens as $Token => $Value)
+		$Output = str_replace($Token, $Value, $Output);
+
+		return $Output;
+	}
+
+	public function
+	GetPostURL(Post $Post):
+	string {
+
+		$Format = '/+:BlogAlias:/:PostID:/:PostAlias:';
+
+		$Tokens = [
+			':BlogID:'    => $this->ID,
+			':BlogAlias:' => $this->Alias,
+			':PostID:'    => $Post->ID,
+			':PostAlias:' => $Post->Alias
+		];
+
+		$Output = $Format;
+		$Token = NULL;
+		$Value = NULL;
+
+		foreach($Tokens as $Token => $Value)
+		$Output = str_replace($Token, $Value, $Output);
+
+		return $Output;
+	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
+	static public function
+	JoinExtendTables(Database\Verse $SQL, string $JAlias='Main', ?string $TPre=NULL):
+	void {
+
+		$Table = static::GetTableInfo();
+		$TPre = $Table->GetPrefixedAlias($TPre);
+		$JAlias = $Table->GetPrefixedAlias($JAlias);
+
+		//User\Entity::JoinMainTables($SQL, $JAlias, 'UserID', $TPre);
+
+		return;
+	}
+
+	static public function
+	JoinExtendFields(Database\Verse $SQL, ?string $TPre=NULL):
+	void {
+
+		$Table = static::GetTableInfo();
+		$TPre = $Table->GetPrefixedAlias($TPre);
+
+		//User\Entity::JoinMainFields($SQL, $TPre);
+
+		return;
+	}
+
+	static public function
+	Insert(iterable $Input):
+	?static {
+
+		$Now = time();
+		$UUID = Common\UUID::V4();
+		$Defines = [
+			'UUID'        => $UUID,
+			'TimeCreated' => $Now,
+			'TimeUpdated' => $Now,
+
+			'Title'       => NULL,
+			'Alias'       => NULL
+		];
+
+		$Dataset = Common\Datastore::NewMerged($Defines, $Input);
+
+		////////
+
+		if(!$Dataset['Title'])
+		throw new Exception('blog must have a title');
+
+		if(!$Dataset['Alias'])
+		$Dataset['Alias'] = Common\Datafilters::PathableKeySingle($Dataset['Title']);
+
+		if(!$Dataset['Alias'])
+		throw new Exception('blog must have a valid alias');
+
+		////////
+
+		return parent::Insert($Dataset);
+	}
+
+}
