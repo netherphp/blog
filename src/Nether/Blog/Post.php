@@ -31,11 +31,43 @@ extends Database\Prototype {
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE)]
 	public int
+	$ImageID;
+
+	#[Database\Meta\TypeIntBig(Unsigned: TRUE)]
+	public int
 	$TimeCreated;
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE)]
 	public int
 	$TimeUpdated;
+
+	#[Database\Meta\TypeIntTiny(Default: 0, Nullable: FALSE)]
+	public int
+	$Enabled;
+
+	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: 0)]
+	public int
+	$CountViews;
+
+	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: 0)]
+	public int
+	$CountComments;
+
+	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: 0)]
+	public int
+	$CountImages;
+
+	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: 0)]
+	public int
+	$CountCodeblocks;
+
+	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: 0)]
+	public int
+	$TimeToRead;
+
+	#[Database\Meta\TypeChar(Size: 36)]
+	public string
+	$UUID;
 
 	#[Database\Meta\TypeVarChar(Size: 255)]
 	public string
@@ -47,11 +79,29 @@ extends Database\Prototype {
 	public string
 	$Title;
 
+	#[Database\Meta\TypeVarChar(Size: 32, Default: 'html')]
+	public string
+	$Editor;
+
 	#[Database\Meta\TypeText]
 	#[Common\Meta\PropertyPatchable]
 	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters','TrimmedText'])]
 	public string
 	$Content;
+
+	#[Database\Meta\TypeText]
+	#[Common\Meta\PropertyPatchable]
+	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters','TrimmedText'])]
+	public string
+	$ContentHTML;
+
+	#[Database\Meta\TypeIntTiny(Default: 0, Nullable: FALSE)]
+	public int
+	$OptAdult;
+
+	#[Database\Meta\TypeIntTiny(Default: 0, Nullable: FALSE)]
+	public int
+	$OptComments;
 
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
@@ -62,12 +112,21 @@ extends Database\Prototype {
 	public User\Entity
 	$User;
 
+	public Common\Date
+	$DateCreated;
+
+	public Common\Date
+	$DateUpdated;
+
 	////////////////////////////////////////////////////////////////
 	// Common\Prototype Overloads //////////////////////////////////
 
 	protected function
 	OnReady(Common\Prototype\ConstructArgs $Args):
 	void {
+
+		$this->DateCreated = Common\Date::FromTime($this->TimeCreated);
+		$this->DateUpdated = Common\Date::FromTime($this->TimeUpdated);
 
 		if($Args->InputHas('BL_ID'))
 		$this->Blog = Blog::FromPrefixedDataset($Args->Input, 'BL_');

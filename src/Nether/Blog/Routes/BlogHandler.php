@@ -20,9 +20,16 @@ extends Atlantis\PublicWeb {
 		$Blog = Blog\Blog::GetByField('Alias', $BlogAlias);
 		$Posts = $Blog->GetRecentPosts();
 
+		// clearly not really the popular posts atm.
+		$Popular = $Posts->Distill(
+			fn(Blog\Post $Post, int $Key)
+			=> $Key < 4
+		);
+
 		$this->Surface->Area('blog/index', [
-			'Blog'  => $Blog,
-			'Posts' => $Posts
+			'Blog'         => $Blog,
+			'Posts'        => $Posts,
+			'Popular'      => $Popular
 		]);
 
 		return;

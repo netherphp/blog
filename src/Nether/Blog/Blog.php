@@ -34,7 +34,7 @@ extends Database\Prototype {
 	public string
 	$Tagline;
 
-	#[Database\Meta\TypeChar(Size: 64, Variable: TRUE)]
+	#[Database\Meta\TypeText]
 	public string
 	$Details;
 
