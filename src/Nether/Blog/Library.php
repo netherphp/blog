@@ -10,12 +10,12 @@ class Library
 extends Common\Library
 implements
 	Atlantis\Plugins\DashboardSidebarInterface,
-	Atlantis\Plugins\AccessTypeDefineInterface,
-	Atlantis\Plugins\FileUploaderInterface {
+	Atlantis\Plugins\AccessTypeDefineInterface {
 
 	const
 	ConfEnable       = 'Nether.Blog.Enable',
-	ConfBlogsPerUser = 'Nether.Blog.BlogsPerUser';
+	ConfBlogsPerUser = 'Nether.Blog.BlogsPerUser',
+	ConfStorageKey   = 'Nether.Blog.StorageKey';
 
 	const
 	AccessBlogCreate = 'Nether.Blog.Create';
@@ -28,7 +28,8 @@ implements
 	void {
 
 		static::$Config->BlendRight([
-			static::ConfEnable => TRUE
+			static::ConfEnable     => TRUE,
+			static::ConfStorageKey => 'Default'
 		]);
 
 		return;
@@ -100,18 +101,6 @@ implements
 				'Prevent user from creating new blogs.'
 			)
 		]);
-
-		return;
-	}
-
-	////////////////////////////////////////////////////////////////
-	// FileUploaderInterface ///////////////////////////////////////
-
-	public function
-	OnFileUpload($File = NULL):
-	void {
-
-		Common\Dump::Var($File, TRUE);
 
 		return;
 	}

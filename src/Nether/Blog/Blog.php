@@ -37,33 +37,33 @@ extends Database\Prototype {
 	#[Database\Meta\TypeChar(Size: 64, Variable: TRUE)]
 	#[Common\Meta\PropertyPatchable]
 	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters', 'TrimmedText'])]
-	public string
+	public ?string
 	$Tagline;
 
 	#[Database\Meta\TypeText]
 	#[Common\Meta\PropertyPatchable]
 	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters', 'TrimmedText'])]
-	public string
+	public ?string
 	$Details;
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: NULL)]
 	#[Common\Meta\PropertyPatchable]
 	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters', 'TypeIntNullable'])]
-	public int
+	public ?int
 	$ImageHeaderID;
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: NULL)]
-	public int
+	public ?string
 	$ImageHeaderURL;
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: NULL)]
 	#[Common\Meta\PropertyPatchable]
 	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters', 'TypeIntNullable'])]
-	public int
+	public ?int
 	$ImageIconID;
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: NULL)]
-	public int
+	public ?string
 	$ImageIconURL;
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: 0)]
@@ -107,9 +107,26 @@ extends Database\Prototype {
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
 
+	public ?Atlantis\Struct\FileUpload
+	$ImageHeader = NULL;
+
+	public ?Atlantis\Struct\FileUpload
+	$ImageIcon = NULL;
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
 	protected function
 	OnReady(Common\Prototype\ConstructArgs $Args):
 	void {
+
+		if($Args->InputHas('IH_ID'))
+		$this->ImageHeader = Atlantis\Struct\FileUpload::FromPrefixedDataset($Args->Input, 'IH_');
+
+		$this->ImageHeaderURL = $this->ImageHeader->GetPublicURL();
+
+		if($Args->InputHas('II_ID'))
+		$this->ImageIcon = Atlantis\Struct\FileUpload::FromPrefixedDataset($Args->Input, 'II_');
 
 		return;
 	}
@@ -210,7 +227,11 @@ extends Database\Prototype {
 		$TPre = $Table->GetPrefixedAlias($TPre);
 		$JAlias = $Table->GetPrefixedAlias($JAlias);
 
-		//User\Entity::JoinMainTables($SQL, $JAlias, 'UserID', $TPre);
+
+		Atlantis\Struct\FileUpload::JoinMainTables($SQL, $JAlias, 'ImageHeaderID', $TPre, 'IH');
+		Atlantis\Struct\FileUpload::JoinMainTables($SQL, $JAlias, 'ImageIconID', $TPre, 'II');
+
+		//Common\Dump::Var($SQL, TRUE);
 
 		return;
 	}
@@ -222,7 +243,8 @@ extends Database\Prototype {
 		$Table = static::GetTableInfo();
 		$TPre = $Table->GetPrefixedAlias($TPre);
 
-		//User\Entity::JoinMainFields($SQL, $TPre);
+		Atlantis\Struct\FileUpload::JoinMainFields($SQL, $TPre, 'IH');
+		Atlantis\Struct\FileUpload::JoinMainFields($SQL, $TPre, 'II');
 
 		return;
 	}

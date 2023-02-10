@@ -31,6 +31,22 @@ extends Atlantis\Routes\UploadAPI {
 		return;
 	}
 
+	#[Atlantis\Meta\RouteHandler('/api/blog/entity/icon', Verb: 'POST')]
+	#[Atlantis\Meta\RouteAccessTypeUser]
+	public function
+	BlogEntityUploadIcon():
+	void {
+
+		$this->Queue(
+			static::KiOnUploadComplete,
+			$this->OnUploadIcon(...),
+			FALSE
+		);
+
+		$this->ChunkPost();
+		return;
+	}
+
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
 
@@ -41,6 +57,44 @@ extends Atlantis\Routes\UploadAPI {
 		($this->Data)
 		->ID(Common\Datafilters::TypeInt(...));
 
+		$this->HandleBlogImageUpload(
+			$this->Data->ID,
+			$Name,
+			$File,
+			'blog/header/%s.jpeg',
+			'--blog-header-%d',
+			'ImageHeaderID'
+		);
+
+		return;
+	}
+
+	public function
+	OnUploadIcon(string $Name, Storage\File $File):
+	void {
+
+		($this->Data)
+		->ID(Common\Datafilters::TypeInt(...));
+
+		$this->HandleBlogImageUpload(
+			$this->Data->ID,
+			$Name,
+			$File,
+			'blog/icon/%s.jpeg',
+			'--blog-icon-%d',
+			'ImageIconID'
+		);
+
+		return;
+	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
+	protected function
+	HandleBlogImageUpload(int $BlogID, string $Name, Storage\File $File, string $Path, string $UUID, string $Field):
+	void {
+
 		$Storage = NULL;
 		$Blog = NULL;
 		$Filedata = NULL;
@@ -48,13 +102,11 @@ extends Atlantis\Routes\UploadAPI {
 		$Filesize = NULL;
 		$Filetype = NULL;
 
-		// handle pre-processing of the upload.
-
 		try {
 			$Storage = $this->PrepareStorageSystem();
-			$Blog = $this->PrepareBlog($this->Data->ID);
+			$Blog = $this->PrepareBlog($BlogID);
 
-			$Filepath = sprintf('blog/header/%s.jpeg', $Blog->UUID);
+			$Filepath = sprintf($Path, $Blog->UUID);
 			$Filedata = $this->ProcessImageData($File);
 
 			$Storage->Put($Filepath, $Filedata);
@@ -74,11 +126,15 @@ extends Atlantis\Routes\UploadAPI {
 			$Filetype = $File->GetType();
 
 			$Entry = Atlantis\Struct\FileUpload::Insert([
-				'UUID' => sprintf('--blog-header-%d', $Blog->ID),
+				'UUID' => sprintf($UUID, $Blog->ID),
 				'Name' => $Name,
 				'Size' => $Filesize,
 				'Type' => $Filetype,
 				'URL'  => $Storage->GetStorageURL($Filepath)
+			]);
+
+			$Blog->Update([
+				$Field => $Entry->ID
 			]);
 		}
 
@@ -96,8 +152,8 @@ extends Atlantis\Routes\UploadAPI {
 	PrepareStorageSystem():
 	Storage\Adaptor {
 
-		$Key = 'Default';
-		$Storage = $this->App->Storage->Locations[$Key];
+		$Key = $this->App->Config[Blog\Library::ConfStorageKey];
+		$Storage = $this->App->Storage->Location($Key);
 
 		if(!$Storage)
 		throw new Exception("no storage location {$Key} defined");
