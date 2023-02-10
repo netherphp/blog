@@ -19,6 +19,10 @@ extends Atlantis\PublicWeb {
 
 		$Blog = Blog\Blog::GetByField('Alias', $BlogAlias);
 		$Posts = $Blog->GetRecentPosts();
+		$BlogUser = NULL;
+
+		if($this->User)
+		$BlogUser = $Blog->GetUser($this->User->ID);
 
 		// clearly not really the popular posts atm.
 		$Popular = $Posts->Distill(
@@ -28,6 +32,7 @@ extends Atlantis\PublicWeb {
 
 		$this->Surface->Area('blog/index', [
 			'Blog'         => $Blog,
+			'BlogUser'     => $BlogUser,
 			'Posts'        => $Posts,
 			'Popular'      => $Popular
 		]);

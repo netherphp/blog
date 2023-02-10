@@ -10,7 +10,8 @@ class Library
 extends Common\Library
 implements
 	Atlantis\Plugins\DashboardSidebarInterface,
-	Atlantis\Plugins\AccessTypeDefineInterface {
+	Atlantis\Plugins\AccessTypeDefineInterface,
+	Atlantis\Plugins\FileUploaderInterface {
 
 	const
 	ConfEnable       = 'Nether.Blog.Enable',
@@ -103,5 +104,16 @@ implements
 		return;
 	}
 
+	////////////////////////////////////////////////////////////////
+	// FileUploaderInterface ///////////////////////////////////////
+
+	public function
+	OnFileUpload($File = NULL):
+	void {
+
+		Common\Dump::Var($File, TRUE);
+
+		return;
+	}
 
 }

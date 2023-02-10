@@ -23,22 +23,32 @@ extends Database\Prototype {
 	$UUID;
 
 	#[Database\Meta\TypeChar(Size: 64, Variable: TRUE)]
+	#[Common\Meta\PropertyPatchable]
+	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters', 'TrimmedText'])]
 	public string
 	$Alias;
 
 	#[Database\Meta\TypeChar(Size: 64, Variable: TRUE)]
+	#[Common\Meta\PropertyPatchable]
+	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters', 'TrimmedText'])]
 	public string
 	$Title;
 
 	#[Database\Meta\TypeChar(Size: 64, Variable: TRUE)]
+	#[Common\Meta\PropertyPatchable]
+	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters', 'TrimmedText'])]
 	public string
 	$Tagline;
 
 	#[Database\Meta\TypeText]
+	#[Common\Meta\PropertyPatchable]
+	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters', 'TrimmedText'])]
 	public string
 	$Details;
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: NULL)]
+	#[Common\Meta\PropertyPatchable]
+	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters', 'TypeIntNullable'])]
 	public int
 	$ImageHeaderID;
 
@@ -47,6 +57,8 @@ extends Database\Prototype {
 	$ImageHeaderURL;
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: NULL)]
+	#[Common\Meta\PropertyPatchable]
+	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters', 'TypeIntNullable'])]
 	public int
 	$ImageIconID;
 
@@ -87,6 +99,8 @@ extends Database\Prototype {
 	$CountReadingTime;
 
 	#[Database\Meta\TypeIntTiny(Unsigned: TRUE, Default: 0)]
+	#[Common\Meta\PropertyPatchable]
+	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters', 'TypeInt'])]
 	public int
 	$OptAdult;
 
@@ -158,6 +172,33 @@ extends Database\Prototype {
 		return $Output;
 	}
 
+	public function
+	GetWriteURL():
+	string {
+
+		return sprintf(
+			'/dashboard/blog/write?id=%d',
+			$this->ID
+		);
+	}
+
+	public function
+	GetSettingsURL():
+	string {
+
+		return sprintf(
+			'/dashboard/blog/settings?id=%d',
+			$this->ID
+		);
+	}
+
+	public function
+	GetUser(int $UserID):
+	?BlogUser {
+
+		return BlogUser::GetByPair($this->ID, $UserID);
+	}
+
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
 
@@ -191,7 +232,7 @@ extends Database\Prototype {
 	?static {
 
 		$Now = time();
-		$UUID = Common\UUID::V4();
+		$UUID = Common\UUID::V7();
 		$Defines = [
 			'UUID'        => $UUID,
 			'TimeCreated' => $Now,

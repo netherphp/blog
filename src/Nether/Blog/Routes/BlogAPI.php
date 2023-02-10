@@ -12,6 +12,115 @@ use Throwable;
 class BlogAPI
 extends Atlantis\ProtectedAPI {
 
+	#[Atlantis\Meta\RouteHandler('/api/blog/entity', Verb: 'GET')]
+	public function
+	BlogEntityGet():
+	void {
+
+		($this->Data)
+		->ID(Common\Datafilters::TypeInt(...));
+
+		////////
+
+		if(!$this->Data->ID)
+		$this->Quit(1, 'no ID specified');
+
+		$Blog = Blog\Blog::GetByID($this->Data->ID);
+
+		if(!$Blog)
+		$this->Quit(2, 'blog not found');
+
+		////////
+
+		$this
+		->SetPayload([
+			'ID'             => $Blog->ID,
+			'URL'            => $Blog->GetURL(),
+			'Title'          => $Blog->Title,
+			'Blog'           => $Blog->Tagline,
+			'Details'        => $Blog->Details,
+			'ImageIconURL'   => NULL,
+			'ImageHeaderURL' => NULL
+		]);
+
+		return;
+	}
+
+	#[Atlantis\Meta\RouteHandler('/api/blog/entity', Verb: 'POST')]
+	#[Atlantis\Meta\RouteAccessTypeUser]
+	public function
+	BlogEntityPost():
+	void {
+
+		($this->Data)
+		->Title(Common\Datafilters::TrimmedText(...))
+		->Alias(Common\Datafilters::TrimmedText(...))
+		->Tagline(Common\Datafilters::StrippedText(...))
+		->Details(Common\Datafilters::TrimmedText(...));
+
+		////////
+
+		if(!$this->Data->Title)
+		$this->Quit(1, 'no Title specified');
+
+		if(!$this->Data->Alias)
+		$this->Quit(1, 'no Alias specified');
+
+		$Blog = Blog\Blog::Insert([
+			'Title'   => $this->Data->Title,
+			'Alias'   => $this->Data->Alias,
+			'Tagline' => $this->Data->Tagline,
+			'Details' => $this->Data->Details
+		]);
+
+		$BlogUser = Blog\BlogUser::Insert([
+			'BlogID' => $Blog->ID,
+			'UserID' => $this->User->ID
+		]);
+
+		$BlogUser->SetAsAdmin();
+
+		$this->SetGoto($Blog->GetURL());
+
+		return;
+	}
+
+	#[Atlantis\Meta\RouteHandler('/api/blog/entity', Verb: 'PATCH')]
+	#[Atlantis\Meta\RouteAccessTypeUser]
+	public function
+	BlogEntityPatch():
+	void {
+
+		($this->Data)
+		->ID(Common\Datafilters::TypeInt(...));
+
+		////////
+
+		if(!$this->Data->ID)
+		$this->Quit(1, 'no ID specified');
+
+		$Blog = Blog\Blog::GetByID($this->Data->ID);
+
+		if(!$Blog)
+		$this->Quit(2, 'blog not found');
+
+		////////
+
+		$BlogUser = Blog\BlogUser::GetByPair($Blog->ID, $this->User->ID);
+
+		if(!$BlogUser || !$BlogUser->CanAdmin())
+		$this->Quit(3, 'user cannot admin this blog');
+
+		$Blog->Update($Blog->Patch($this->Data));
+
+		$this->SetGoto($Blog->GetURL());
+
+		return;
+	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
 	#[Atlantis\Meta\RouteHandler('/api/blog/post', Verb: 'GET')]
 	public function
 	BlogPostGet():
@@ -74,12 +183,16 @@ extends Atlantis\ProtectedAPI {
 		////////
 
 		try {
-			Blog\Post::Insert([
+			$Post = Blog\Post::Insert([
 				'BlogID'  => $BlogUser->BlogID,
 				'UserID'  => $BlogUser->UserID,
 				'Title'   => $this->Data->Title,
 				'Alias'   => $this->Data->Alias,
 				'Content' => $this->Data->Content
+			]);
+
+			$Post->Update([
+				'ContentHTML' => $Post->ParseContent($this->Data->Content)
 			]);
 		}
 
@@ -90,6 +203,8 @@ extends Atlantis\ProtectedAPI {
 		catch(Throwable $Err) {
 			$this->Quit(PHP_INT_MAX, "WTF: {$Err->GetMessage()}");
 		}
+
+		$this->SetGoto($Post->GetURL());
 
 		return;
 	}
@@ -121,19 +236,16 @@ extends Atlantis\ProtectedAPI {
 		);
 
 		if(!$BlogUser)
-		$this->Quit(3, 'user does not have blog access');
+		$this->Quit(3, 'user does not have any blog access');
 
-		if(!$BlogUser->CanEdit())
-		if($Post->UserID !== $this->User->ID)
+		if(!$Post->CanUserEdit($BlogUser))
 		$this->Quit(3, 'user does not have blog edit access');
 
 		////////
 
 		$Post->Update($Post->Patch($this->Data));
 
-		$this->SetPayload([
-			'Post' => $Post
-		]);
+		$this->SetGoto($Post->GetURL());
 
 		return;
 	}

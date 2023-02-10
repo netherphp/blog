@@ -30,6 +30,8 @@ extends Database\Prototype {
 	$UserID;
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE)]
+	#[Common\Meta\PropertyPatchable]
+	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters','TypeIntNullable'])]
 	public int
 	$ImageID;
 
@@ -42,6 +44,8 @@ extends Database\Prototype {
 	$TimeUpdated;
 
 	#[Database\Meta\TypeIntTiny(Default: 0, Nullable: FALSE)]
+	#[Common\Meta\PropertyPatchable]
+	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters','TypeInt'])]
 	public int
 	$Enabled;
 
@@ -90,16 +94,18 @@ extends Database\Prototype {
 	$Content;
 
 	#[Database\Meta\TypeText]
-	#[Common\Meta\PropertyPatchable]
-	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters','TrimmedText'])]
 	public string
 	$ContentHTML;
 
 	#[Database\Meta\TypeIntTiny(Default: 0, Nullable: FALSE)]
+	#[Common\Meta\PropertyPatchable]
+	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters','TypeInt'])]
 	public int
 	$OptAdult;
 
 	#[Database\Meta\TypeIntTiny(Default: 0, Nullable: FALSE)]
+	#[Common\Meta\PropertyPatchable]
+	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters','TypeInt'])]
 	public int
 	$OptComments;
 
@@ -149,6 +155,9 @@ extends Database\Prototype {
 		if(array_key_exists('Title', $Output))
 		$Output['Alias'] = Common\Datafilters::PathableKeySingle($Output['Title']);
 
+		if(array_key_exists('Content', $Output))
+		$Output['ContentHTML'] = $this->ParseContent($Output['Content']);
+
 		return $Output;
 	}
 
@@ -156,10 +165,60 @@ extends Database\Prototype {
 	////////////////////////////////////////////////////////////////
 
 	public function
+	CanUserEdit(BlogUser $Who):
+	bool {
+
+		if($Who->UserID !== $this->UserID)
+		return $Who->CanEdit();
+
+		return $Who->CanWrite();
+	}
+
+	public function
+	ParseContent(string $Input):
+	?string {
+
+		if($this->Editor === 'json')
+		return $this->ParseContentAsJSON($Input);
+
+		return $this->ParseContentAsHTML($Input);
+	}
+
+	public function
+	ParseContentAsJSON(string $Input):
+	string {
+
+		// ...
+
+		return '';
+	}
+
+	public function
+	ParseContentAsHTML(string $Input):
+	string {
+
+		$Output = $Input;
+
+		// ...
+
+		return $Output;
+	}
+
+	public function
 	GetURL():
 	string {
 
 		return $this->Blog->GetPostURL($this);
+	}
+
+	public function
+	GetEditURL():
+	string {
+
+		return sprintf(
+			'/dashboard/blog/edit?id=%d',
+			$this->ID
+		);
 	}
 
 	////////////////////////////////////////////////////////////////
@@ -275,7 +334,7 @@ extends Database\Prototype {
 		$Data['Alias'] = Avenue\Util::MakeKey($Data['Alias']);
 
 		if(!$Data['Alias'])
-		$Data['Alias'] = Common\UUID::V4();
+		$Data['Alias'] = Common\UUID::V7();
 
 		////////
 
