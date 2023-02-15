@@ -153,12 +153,73 @@ extends Database\Prototype {
 		$Output = parent::Patch($Input);
 
 		if(array_key_exists('Title', $Output))
-		$Output['Alias'] = Common\Datafilters::PathableKeySingle($Output['Title']);
+		$Output['Alias'] = Common\Datafilters::SlottableKey($Output['Title']);
 
 		if(array_key_exists('Content', $Output))
 		$Output['ContentHTML'] = $this->ParseContent($Output['Content']);
 
 		return $Output;
+	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
+	public function
+	GetExcerpt():
+	string {
+
+		$Output = match($this->Editor) {
+			'editorjs'
+			=> $this->GetExcerptFromJSON(),
+
+			default
+			=> $this->GetExcerptFromHTML()
+		};
+
+		return $Output;
+	}
+
+	protected function
+	GetExcerptFromJSON():
+	string {
+
+		return '';
+	}
+
+	protected function
+	GetExcerptFromHTML(int $Len=100):
+	string {
+
+		$Output = preg_replace('#<[Bb][Rr] ?/?>#', ' ', $this->Content);
+
+		$Bits = explode(' ', strip_tags($Output), ($Len + 1));
+		$Output = join(' ', array_slice($Bits, 0, $Len));
+
+		if(count($Bits) > $Len)
+		if(!str_ends_with($Output, '.'))
+		$Output .= '...';
+
+		return $Output;
+	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
+	public function
+	GetURL():
+	string {
+
+		return $this->Blog->GetPostURL($this);
+	}
+
+	public function
+	GetEditURL():
+	string {
+
+		return sprintf(
+			'/dashboard/blog/edit?id=%d',
+			$this->ID
+		);
 	}
 
 	////////////////////////////////////////////////////////////////
@@ -202,23 +263,6 @@ extends Database\Prototype {
 		// ...
 
 		return $Output;
-	}
-
-	public function
-	GetURL():
-	string {
-
-		return $this->Blog->GetPostURL($this);
-	}
-
-	public function
-	GetEditURL():
-	string {
-
-		return sprintf(
-			'/dashboard/blog/edit?id=%d',
-			$this->ID
-		);
 	}
 
 	////////////////////////////////////////////////////////////////

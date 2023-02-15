@@ -53,18 +53,10 @@ extends Database\Prototype {
 	$ImageHeaderID;
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: NULL)]
-	public ?string
-	$ImageHeaderURL;
-
-	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: NULL)]
 	#[Common\Meta\PropertyPatchable]
 	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters', 'TypeIntNullable'])]
 	public ?int
 	$ImageIconID;
-
-	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: NULL)]
-	public ?string
-	$ImageIconURL;
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: 0)]
 	public int
@@ -107,10 +99,10 @@ extends Database\Prototype {
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
 
-	public ?Atlantis\Struct\FileUpload
+	public ?Atlantis\Media\File
 	$ImageHeader = NULL;
 
-	public ?Atlantis\Struct\FileUpload
+	public ?Atlantis\Media\File
 	$ImageIcon = NULL;
 
 	////////////////////////////////////////////////////////////////
@@ -121,12 +113,10 @@ extends Database\Prototype {
 	void {
 
 		if($Args->InputHas('IH_ID'))
-		$this->ImageHeader = Atlantis\Struct\FileUpload::FromPrefixedDataset($Args->Input, 'IH_');
-
-		$this->ImageHeaderURL = $this->ImageHeader->GetPublicURL();
+		$this->ImageHeader = Atlantis\Media\File::FromPrefixedDataset($Args->Input, 'IH_');
 
 		if($Args->InputHas('II_ID'))
-		$this->ImageIcon = Atlantis\Struct\FileUpload::FromPrefixedDataset($Args->Input, 'II_');
+		$this->ImageIcon = Atlantis\Media\File::FromPrefixedDataset($Args->Input, 'II_');
 
 		return;
 	}
@@ -210,6 +200,26 @@ extends Database\Prototype {
 	}
 
 	public function
+	GetHeaderURL():
+	string {
+
+		if($this->ImageHeader)
+		return $this->ImageHeader->GetPublicURL();
+
+		return '';
+	}
+
+	public function
+	GetIconURL():
+	string {
+
+		if($this->ImageIcon)
+		return $this->ImageIcon->GetPublicURL();
+
+		return '';
+	}
+
+	public function
 	GetUser(int $UserID):
 	?BlogUser {
 
@@ -228,8 +238,8 @@ extends Database\Prototype {
 		$JAlias = $Table->GetPrefixedAlias($JAlias);
 
 
-		Atlantis\Struct\FileUpload::JoinMainTables($SQL, $JAlias, 'ImageHeaderID', $TPre, 'IH');
-		Atlantis\Struct\FileUpload::JoinMainTables($SQL, $JAlias, 'ImageIconID', $TPre, 'II');
+		Atlantis\Media\File::JoinMainTables($SQL, $JAlias, 'ImageHeaderID', $TPre, 'IH');
+		Atlantis\Media\File::JoinMainTables($SQL, $JAlias, 'ImageIconID', $TPre, 'II');
 
 		//Common\Dump::Var($SQL, TRUE);
 
@@ -243,8 +253,8 @@ extends Database\Prototype {
 		$Table = static::GetTableInfo();
 		$TPre = $Table->GetPrefixedAlias($TPre);
 
-		Atlantis\Struct\FileUpload::JoinMainFields($SQL, $TPre, 'IH');
-		Atlantis\Struct\FileUpload::JoinMainFields($SQL, $TPre, 'II');
+		Atlantis\Media\File::JoinMainFields($SQL, $TPre, 'IH');
+		Atlantis\Media\File::JoinMainFields($SQL, $TPre, 'II');
 
 		return;
 	}
@@ -272,7 +282,7 @@ extends Database\Prototype {
 		throw new Exception('blog must have a title');
 
 		if(!$Dataset['Alias'])
-		$Dataset['Alias'] = Common\Datafilters::PathableKeySingle($Dataset['Title']);
+		$Dataset['Alias'] = Common\Datafilters::SlottableKey($Dataset['Title']);
 
 		if(!$Dataset['Alias'])
 		throw new Exception('blog must have a valid alias');

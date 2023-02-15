@@ -103,7 +103,7 @@ extends Atlantis\Routes\UploadAPI {
 		$Filetype = NULL;
 
 		try {
-			$Storage = $this->PrepareStorageSystem();
+			$Storage = $this->PrepareStorageLocation(Blog\Library::ConfStorageKey);
 			$Blog = $this->PrepareBlog($BlogID);
 
 			$Filepath = sprintf($Path, $Blog->UUID);
@@ -125,7 +125,7 @@ extends Atlantis\Routes\UploadAPI {
 			$Filesize = $File->GetSize();
 			$Filetype = $File->GetType();
 
-			$Entry = Atlantis\Struct\FileUpload::Insert([
+			$Entry = Atlantis\Media\File::Insert([
 				'UUID' => sprintf($UUID, $Blog->ID),
 				'Name' => $Name,
 				'Size' => $Filesize,
@@ -133,9 +133,8 @@ extends Atlantis\Routes\UploadAPI {
 				'URL'  => $Storage->GetStorageURL($Filepath)
 			]);
 
-			$Blog->Update([
-				$Field => $Entry->ID
-			]);
+			if(!isset($Blog->{$Field}) || $Blog->{$Field} !== $Entry->ID)
+			$Blog->Update([ $Field => $Entry->ID ]);
 		}
 
 		catch(Exception $Error) {
@@ -147,19 +146,6 @@ extends Atlantis\Routes\UploadAPI {
 
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
-
-	protected function
-	PrepareStorageSystem():
-	Storage\Adaptor {
-
-		$Key = $this->App->Config[Blog\Library::ConfStorageKey];
-		$Storage = $this->App->Storage->Location($Key);
-
-		if(!$Storage)
-		throw new Exception("no storage location {$Key} defined");
-
-		return $Storage;
-	}
 
 	protected function
 	PrepareBlog(?int $BlogID):
