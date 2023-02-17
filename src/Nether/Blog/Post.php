@@ -3,6 +3,7 @@
 namespace Nether\Blog;
 
 use ArrayAccess;
+use Nether\Atlantis;
 use Nether\Avenue;
 use Nether\Common;
 use Nether\Database;
@@ -12,7 +13,7 @@ use Exception;
 
 #[Database\Meta\TableClass('BlogPosts', 'BP')]
 class Post
-extends Database\Prototype {
+extends Atlantis\Prototype {
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE, AutoInc: TRUE)]
 	#[Database\Meta\PrimaryKey]
@@ -351,6 +352,7 @@ extends Database\Prototype {
 
 		$Data = new Common\Datastore($Input);
 		$Data->BlendRight([
+			'UUID'        => Common\UUID::V7(),
 			'UserID'      => NULL,
 			'BlogID'      => NULL,
 			'Title'       => NULL,

@@ -61,7 +61,7 @@ extends Atlantis\Routes\UploadAPI {
 			$this->Data->ID,
 			$Name,
 			$File,
-			'blog/header/%s.jpeg',
+			'blog/%s/header/original.jpeg',
 			'--blog-header-%d',
 			'ImageHeaderID'
 		);
@@ -80,7 +80,7 @@ extends Atlantis\Routes\UploadAPI {
 			$this->Data->ID,
 			$Name,
 			$File,
-			'blog/icon/%s.jpeg',
+			'blog/%s/icon/original.jpeg',
 			'--blog-icon-%d',
 			'ImageIconID'
 		);
@@ -103,7 +103,7 @@ extends Atlantis\Routes\UploadAPI {
 		$Filetype = NULL;
 
 		try {
-			$Storage = $this->PrepareStorageLocation(Blog\Library::ConfStorageKey);
+			$Storage = $this->PrepareStorageLocation(Blog\Library::Get(Blog\Library::ConfStorageKey));
 			$Blog = $this->PrepareBlog($BlogID);
 
 			$Filepath = sprintf($Path, $Blog->UUID);

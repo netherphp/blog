@@ -65,21 +65,25 @@ extends Atlantis\PublicWeb {
 	#[Avenue\Meta\RouteHandler('/blog/:BlogAlias:/:PostID:/:PostAlias:')]
 	#[Avenue\Meta\ConfirmWillAnswerRequest]
 	public function
-	ViewPost(string $BlogAlias, int $PostID, ?string $PostAlias=NULL):
+	ViewPost(string $BlogAlias, int $PostID, ?string $PostAlias, Blog\Post $Post):
 	void {
 
-		$Post = Blog\Post::GetByID($PostID);
+		$BlogUser = NULL;
+
+		if($this->User)
+		$BlogUser = $Post->Blog->GetUser($this->User->ID);
 
 		$this->Surface->Area('blog/view', [
-			'Blog' => $Post->Blog,
-			'Post' => $Post
+			'Blog'     => $Post->Blog,
+			'Post'     => $Post,
+			'BlogUser' => $BlogUser
 		]);
 
 		return;
 	}
 
 	protected function
-	ViewPostWillAnswerRequest(string $BlogAlias, int $PostID, ?string $PostAlias=NULL):
+	ViewPostWillAnswerRequest(string $BlogAlias, int $PostID, ?string $PostAlias, Common\Datastore $ExtraData):
 	int {
 
 		$Post = Blog\Post::GetByID($PostID);
@@ -116,6 +120,8 @@ extends Atlantis\PublicWeb {
 
 			return Avenue\Response::CodeRedirectPerm;
 		}
+
+		$ExtraData['Post'] = $Post;
 
 		return Avenue\Response::CodeOK;
 	}
