@@ -51,7 +51,7 @@ extends Atlantis\Routes\UploadAPI {
 	////////////////////////////////////////////////////////////////
 
 	public function
-	OnUploadHeader(string $Name, Storage\File $File):
+	OnUploadHeader(string $Name, string $UUID, Storage\File $Source):
 	void {
 
 		($this->Data)
@@ -60,7 +60,7 @@ extends Atlantis\Routes\UploadAPI {
 		$this->HandleBlogImageUpload(
 			$this->Data->ID,
 			$Name,
-			$File,
+			$Source,
 			'blog/%s/header/original.jpeg',
 			'--blog-header-%d',
 			'ImageHeaderID'
@@ -70,7 +70,7 @@ extends Atlantis\Routes\UploadAPI {
 	}
 
 	public function
-	OnUploadIcon(string $Name, Storage\File $File):
+	OnUploadIcon(string $Name, string $UUID, Storage\File $Source):
 	void {
 
 		($this->Data)
@@ -79,7 +79,7 @@ extends Atlantis\Routes\UploadAPI {
 		$this->HandleBlogImageUpload(
 			$this->Data->ID,
 			$Name,
-			$File,
+			$Source,
 			'blog/%s/icon/original.jpeg',
 			'--blog-icon-%d',
 			'ImageIconID'

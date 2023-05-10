@@ -2,6 +2,7 @@
 
 namespace Nether\Blog;
 
+use Nether\Atlantis;
 use Nether\User;
 use Nether\Common;
 use Nether\Database;
@@ -10,7 +11,7 @@ use Exception;
 
 #[Database\Meta\TableClass('BlogUsers', 'BU')]
 class BlogUser
-extends Database\Prototype {
+extends Atlantis\Prototype {
 
 	// admin can do anything
 	// editor can edit/delete anything but not change settings.
