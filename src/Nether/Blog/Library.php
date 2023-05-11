@@ -75,9 +75,6 @@ implements
 		if($App->User)
 		$Sidebar->Push(new Dashboard\BlogSidebarGroup($App));
 
-		if($App->User && $App->User->IsAdmin())
-		$Sidebar->Push(new Dashboard\BlogAdminGroup);
-
 		return;
 	}
 

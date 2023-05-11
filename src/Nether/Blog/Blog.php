@@ -47,12 +47,14 @@ extends Database\Prototype {
 	$Details;
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: NULL)]
+	#[Database\Meta\ForeignKey('Uploads', 'ID')]
 	#[Common\Meta\PropertyPatchable]
 	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters', 'TypeIntNullable'])]
 	public ?int
 	$ImageHeaderID;
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: NULL)]
+	#[Database\Meta\ForeignKey('Uploads', 'ID')]
 	#[Common\Meta\PropertyPatchable]
 	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters', 'TypeIntNullable'])]
 	public ?int

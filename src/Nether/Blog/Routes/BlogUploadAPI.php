@@ -21,13 +21,23 @@ extends Atlantis\Routes\UploadAPI {
 	BlogEntityUploadHeader():
 	void {
 
+		$this->ChunkPost();
+		return;
+	}
+
+	#[Atlantis\Meta\RouteHandler('/api/blog/entity/header', Verb: 'POSTFINAL')]
+	#[Atlantis\Meta\RouteAccessTypeUser]
+	public function
+	BlogEntityUploadHeaderFinal():
+	void {
+
 		$this->Queue(
-			static::KiOnUploadComplete,
+			static::KiOnUploadFinalise,
 			$this->OnUploadHeader(...),
 			FALSE
 		);
 
-		$this->ChunkPost();
+		$this->ChunkFinalise();
 		return;
 	}
 
@@ -37,13 +47,23 @@ extends Atlantis\Routes\UploadAPI {
 	BlogEntityUploadIcon():
 	void {
 
+		$this->ChunkPost();
+		return;
+	}
+
+	#[Atlantis\Meta\RouteHandler('/api/blog/entity/icon', Verb: 'POSTFINAL')]
+	#[Atlantis\Meta\RouteAccessTypeUser]
+	public function
+	BlogEntityUploadIconFinal():
+	void {
+
 		$this->Queue(
-			static::KiOnUploadComplete,
+			static::KiOnUploadFinalise,
 			$this->OnUploadIcon(...),
 			FALSE
 		);
 
-		$this->ChunkPost();
+		$this->ChunkFinalise();
 		return;
 	}
 
@@ -126,12 +146,15 @@ extends Atlantis\Routes\UploadAPI {
 			$Filetype = $File->GetType();
 
 			$Entry = Atlantis\Media\File::Insert([
-				'UUID' => sprintf($UUID, $Blog->ID),
-				'Name' => $Name,
-				'Size' => $Filesize,
-				'Type' => $Filetype,
-				'URL'  => $Storage->GetStorageURL($Filepath)
+				'UserID' => $this->User->ID,
+				'UUID'   => sprintf($UUID, $Blog->ID),
+				'Name'   => $Name,
+				'Size'   => $Filesize,
+				'Type'   => $Filetype,
+				'URL'    => $Storage->GetStorageURL($Filepath)
 			]);
+
+			$Entry->GenerateExtraFiles();
 
 			if(!isset($Blog->{$Field}) || $Blog->{$Field} !== $Entry->ID)
 			$Blog->Update([ $Field => $Entry->ID ]);

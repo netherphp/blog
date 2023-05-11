@@ -83,7 +83,7 @@ extends Atlantis\PublicWeb {
 	}
 
 	protected function
-	ViewPostWillAnswerRequest(string $BlogAlias, int $PostID, ?string $PostAlias, Common\Datastore $ExtraData):
+	ViewPostWillAnswerRequest(string $BlogAlias, int $PostID, ?string $PostAlias, Avenue\Struct\ExtraData $ExtraData):
 	int {
 
 		$Post = Blog\Post::GetByID($PostID);

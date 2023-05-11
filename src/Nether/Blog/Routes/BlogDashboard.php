@@ -131,7 +131,7 @@ extends Atlantis\ProtectedWeb {
 	}
 
 	protected function
-	BlogEditWillAnswerRequest(Common\Datastore $ExtraData):
+	BlogEditWillAnswerRequest(Avenue\Struct\ExtraData $ExtraData):
 	int {
 
 		// bail if the post could not even be found.
