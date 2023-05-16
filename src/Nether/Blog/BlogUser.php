@@ -17,11 +17,6 @@ extends Atlantis\Prototype {
 	// editor can edit/delete anything but not change settings.
 	// writer can only edit their own posts.
 
-	#[Database\Meta\TypeIntBig(Unsigned: TRUE, AutoInc: TRUE)]
-	#[Database\Meta\PrimaryKey]
-	public int
-	$ID;
-
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE)]
 	#[Database\Meta\ForeignKey('Blogs', 'ID')]
 	public int
@@ -148,7 +143,6 @@ extends Atlantis\Prototype {
 	GetByPair(int $BlogID, int $UserID):
 	?static {
 
-
 		$Table = static::GetTableInfo();
 		$DBM = new Database\Manager;
 
@@ -160,7 +154,7 @@ extends Atlantis\Prototype {
 		$SQL = (
 			($DBM->NewVerse(static::$DBA))
 			->Select("{$Table->Name} Main")
-			->Fields('*')
+			->Fields('Main.*')
 			->Where('Main.BlogID=:BlogID AND Main.UserID=:UserID')
 			->Limit(1)
 		);
