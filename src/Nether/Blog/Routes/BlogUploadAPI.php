@@ -31,12 +31,6 @@ extends Atlantis\Routes\UploadAPI {
 	BlogEntityUploadHeaderFinal():
 	void {
 
-		$this->Queue(
-			static::KiOnUploadFinalise,
-			$this->OnUploadHeader(...),
-			FALSE
-		);
-
 		$this->ChunkFinalise();
 		return;
 	}
@@ -57,113 +51,7 @@ extends Atlantis\Routes\UploadAPI {
 	BlogEntityUploadIconFinal():
 	void {
 
-		$this->Queue(
-			static::KiOnUploadFinalise,
-			$this->OnUploadIcon(...),
-			FALSE
-		);
-
 		$this->ChunkFinalise();
-		return;
-	}
-
-	////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////
-
-	public function
-	OnUploadHeader(string $Name, string $UUID, Storage\File $Source):
-	void {
-
-		($this->Data)
-		->ID(Common\Datafilters::TypeInt(...));
-
-		$this->HandleBlogImageUpload(
-			$this->Data->ID,
-			$Name,
-			$Source,
-			'blog/%s/header/original.jpeg',
-			'--blog-header-%d',
-			'ImageHeaderID'
-		);
-
-		return;
-	}
-
-	public function
-	OnUploadIcon(string $Name, string $UUID, Storage\File $Source):
-	void {
-
-		($this->Data)
-		->ID(Common\Datafilters::TypeInt(...));
-
-		$this->HandleBlogImageUpload(
-			$this->Data->ID,
-			$Name,
-			$Source,
-			'blog/%s/icon/original.jpeg',
-			'--blog-icon-%d',
-			'ImageIconID'
-		);
-
-		return;
-	}
-
-	////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////
-
-	protected function
-	HandleBlogImageUpload(int $BlogID, string $Name, Storage\File $File, string $Path, string $UUID, string $Field):
-	void {
-
-		$Storage = NULL;
-		$Blog = NULL;
-		$Filedata = NULL;
-		$Filepath = NULL;
-		$Filesize = NULL;
-		$Filetype = NULL;
-
-		try {
-			$Storage = $this->PrepareStorageLocation(Blog\Library::Get(Blog\Library::ConfStorageKey));
-			$Blog = $this->PrepareBlog($BlogID);
-
-			$Filepath = sprintf($Path, $Blog->UUID);
-			$Filedata = $this->ProcessImageData($File);
-
-			$Storage->Put($Filepath, $Filedata);
-			$File->DeleteParentDirectory();
-		}
-
-		catch(Exception $Error) {
-			$this->CleanupAfterFailure($File);
-			$this->Quit(1, $Error->GetMessage());
-		}
-
-		// handle storage of the upload.
-
-		try {
-			$File = $Storage->GetFileObject($Filepath);
-			$Filesize = $File->GetSize();
-			$Filetype = $File->GetType();
-
-			$Entry = Atlantis\Media\File::Insert([
-				'UserID' => $this->User->ID,
-				'UUID'   => sprintf($UUID, $Blog->ID),
-				'Name'   => $Name,
-				'Size'   => $Filesize,
-				'Type'   => $Filetype,
-				'URL'    => $Storage->GetStorageURL($Filepath)
-			]);
-
-			$Entry->GenerateExtraFiles();
-
-			if(!isset($Blog->{$Field}) || $Blog->{$Field} !== $Entry->ID)
-			$Blog->Update([ $Field => $Entry->ID ]);
-		}
-
-		catch(Exception $Error) {
-			$this->Quit(2, $Error->GetMessage());
-		}
-
 		return;
 	}
 

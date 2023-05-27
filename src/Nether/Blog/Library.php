@@ -5,12 +5,16 @@ namespace Nether\Blog;
 use Nether\Atlantis;
 use Nether\Avenue;
 use Nether\Common;
+use Nether\Storage;
+
+use Exception;
 
 class Library
 extends Common\Library
 implements
 	Atlantis\Plugins\DashboardSidebarInterface,
-	Atlantis\Plugins\AccessTypeDefineInterface {
+	Atlantis\Plugins\AccessTypeDefineInterface,
+	Atlantis\Plugins\UploadHandlerInterface {
 
 	const
 	ConfEnable       = 'Nether.Blog.Enable',
@@ -97,6 +101,148 @@ implements
 				static::AccessBlogCreate, 0,
 				'Prevent user from creating new blogs.'
 			)
+		]);
+
+		return;
+	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
+	public function
+	OnUploadFinalise(Atlantis\Engine $App, string $UUID, string $Name, string $Type, Storage\File $File):
+	void {
+
+		switch($Type) {
+			case 'bloghead':
+				$this->OnUploadFinaliseHead($App, $UUID, $Name, $File);
+			break;
+			case 'blogicon':
+				$this->OnUploadFinaliseIcon($App, $UUID, $Name, $File);
+			break;
+			case 'blogimg':
+				$this->OnUploadFinaliseImage($App, $UUID, $Name, $File);
+			break;
+		}
+
+		return;
+	}
+
+	protected function
+	OnUploadFinaliseHead(Atlantis\Engine $App, string $UUID, string $Name, Storage\File $File):
+	void {
+
+		$Storage = $App->Storage->Location('Default');
+		$Blog = Blog::GetByID($App->Router->Request->Data->ID);
+		$UUID = "--blog-head-{$Blog->ID}";
+		$Path = sprintf(
+			'blog/%s/head/original.%s',
+			$Blog->UUID,
+			$File->GetExtension()
+		);
+
+		// move the file to where it needs to live.
+
+		$Storage->Put($Path, $File->Read());
+		$File->DeleteParentDirectory();
+
+		// track the file in the database.
+
+		$File = $Storage->GetFileObject($Path);
+
+		$Entity = Atlantis\Media\File::Insert([
+			'UUID'   => $UUID,
+			'UserID' => $App->User?->ID,
+			'Name'   => $Name,
+			'Type'   => $File->GetType(),
+			'Size'   => $File->GetSize(),
+			'URL'    => $File->GetStorageURL()
+		]);
+
+		$Entity->GenerateExtraFiles();
+
+		$Blog->Update([
+			'ImageHeaderID' => $Entity->ID
+		]);
+
+		return;
+	}
+
+	protected function
+	OnUploadFinaliseIcon(Atlantis\Engine $App, string $UUID, string $Name, Storage\File $File):
+	void {
+
+		$Storage = $App->Storage->Location('Default');
+		$Blog = Blog::GetByID($App->Router->Request->Data->ID);
+		$UUID = "--blog-icon-{$Blog->ID}";
+		$Path = sprintf(
+			'blog/%s/icon/original.%s',
+			$Blog->UUID,
+			$File->GetExtension()
+		);
+
+		// move the file to where it needs to live.
+
+		$Storage->Put($Path, $File->Read());
+		$File->DeleteParentDirectory();
+
+		// track the file in the database.
+
+		$File = $Storage->GetFileObject($Path);
+
+		$Entity = Atlantis\Media\File::Insert([
+			'UUID'   => $UUID,
+			'UserID' => $App->User?->ID,
+			'Name'   => $Name,
+			'Type'   => $File->GetType(),
+			'Size'   => $File->GetSize(),
+			'URL'    => $File->GetStorageURL()
+		]);
+
+		$Entity->GenerateExtraFiles();
+
+		$Blog->Update([
+			'ImageIconID' => $Entity->ID
+		]);
+
+		return;
+	}
+
+	protected function
+	OnUploadFinaliseImage(Atlantis\Engine $App, string $UUID, string $Name, Storage\File $File):
+	void {
+
+		$Storage = $App->Storage->Location('Default');
+		$Blog = Blog::GetByID($App->Router->Request->Data->ID);
+		$Path = sprintf(
+			'blog/%s/%s/original.%s',
+			$Blog->UUID,
+			$UUID,
+			$File->GetExtension()
+		);
+
+		// move the file to where it needs to live.
+
+		$Storage->Put($Path, $File->Read());
+		$File->DeleteParentDirectory();
+
+		// track the file in the database.
+
+		$File = $Storage->GetFileObject($Path);
+
+		$Entity = Atlantis\Media\File::Insert([
+			'UUID'   => $UUID,
+			'UserID' => $App->User?->ID,
+			'Name'   => $Name,
+			'Type'   => $File->GetType(),
+			'Size'   => $File->GetSize(),
+			'URL'    => $File->GetStorageURL()
+		]);
+
+		$Entity->GenerateExtraFiles();
+
+		$Blog->Update([
+			'ImageHeaderID' => $Entity->ID
 		]);
 
 		return;
