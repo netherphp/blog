@@ -58,7 +58,11 @@ extends Atlantis\ProtectedWeb {
 	void {
 
 		($this->Data)
-		->ID(Common\Datafilters::TypeIntNullable(...));
+		->ID(Common\Datafilters::TypeIntNullable(...))
+		->Editor([
+			Common\Datafilters::SlottableKey(...),
+			Common\Datafilters::Nullable(...)
+		]);
 
 		////////
 
@@ -70,8 +74,9 @@ extends Atlantis\ProtectedWeb {
 
 		($this->Surface)
 		->Wrap('blog/dashboard/blog-write', [
-			'Post'  => NULL,
-			'Blogs' => $Blogs
+			'Post'    => NULL,
+			'Editor'  => $this->Data->Editor,
+			'Blogs'   => $Blogs
 		]);
 
 		return;
@@ -123,8 +128,9 @@ extends Atlantis\ProtectedWeb {
 
 		($this->Surface)
 		->Wrap('blog/dashboard/blog-write', [
-			'Post'  => $Post,
-			'Blogs' => $Blogs
+			'Post'   => $Post,
+			'Blogs'  => $Blogs,
+			'Editor' => $Post->Editor
 		]);
 
 		return;

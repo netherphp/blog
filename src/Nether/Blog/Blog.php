@@ -11,7 +11,7 @@ use Exception;
 
 #[Database\Meta\TableClass('Blogs', 'BL')]
 class Blog
-extends Database\Prototype {
+extends Atlantis\Prototype {
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE, AutoInc: TRUE)]
 	#[Database\Meta\PrimaryKey]
@@ -127,6 +127,21 @@ extends Database\Prototype {
 	////////////////////////////////////////////////////////////////
 
 	public function
+	DescribeForPublicAPI():
+	array {
+
+		return [
+			'ID'             => $this->ID,
+			'URL'            => $this->GetURL(),
+			'Title'          => $this->Title,
+			'Blog'           => $this->Tagline,
+			'Details'        => $this->Details,
+			'ImageIconURL'   => NULL,
+			'ImageHeaderURL' => NULL
+		];
+	}
+
+	public function
 	GetRecentPosts(int $Page=1):
 	Database\Struct\PrototypeFindResult {
 
@@ -220,6 +235,9 @@ extends Database\Prototype {
 
 		return '';
 	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
 
 	public function
 	GetUser(int $UserID):

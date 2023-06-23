@@ -45,6 +45,8 @@ implements
 
 		$App = $Argv['App'];
 
+		PostTagLink::RegisterType();
+
 		if($App->Router->GetSource() === 'dirscan') {
 			$RouterPath = dirname(__FILE__);
 			$Scanner = new Avenue\RouteScanner("{$RouterPath}/Routes");
@@ -122,6 +124,9 @@ implements
 			break;
 			case 'blogimg':
 				$this->OnUploadFinaliseImage($App, $UUID, $Name, $File);
+			break;
+			case 'posthead':
+				$this->OnUploadFinalisePostHead($App, $UUID, $Name, $File);
 			break;
 		}
 
@@ -244,6 +249,31 @@ implements
 		$Blog->Update([
 			'ImageHeaderID' => $Entity->ID
 		]);
+
+		return;
+	}
+
+	protected function
+	OnUploadFinalisePostHead(Atlantis\Engine $App, string $UUID, string $Name, Storage\File $File):
+	void {
+
+		$App->Library['Atlantis']->OnUploadFinalise($App, $UUID, $Name, 'default', $File);
+
+		////////
+
+		$Upload = Atlantis\Media\File::GetByUUID($UUID);
+
+		if(!$Upload)
+		throw new Exception("Upload {$UUID} Not Found");
+
+		//$Post = Post::GetByID($App->Router->Request->Data->ID);
+
+		//if(!$Post)
+		//throw new Exception("Post {$App->Router->Request->Data->ID} Not Found");
+
+		////////
+
+		//$Post->Update([ 'CoverImageID' => $Upload->ID ]);
 
 		return;
 	}

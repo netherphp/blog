@@ -32,16 +32,7 @@ extends Atlantis\ProtectedAPI {
 
 		////////
 
-		$this
-		->SetPayload([
-			'ID'             => $Blog->ID,
-			'URL'            => $Blog->GetURL(),
-			'Title'          => $Blog->Title,
-			'Blog'           => $Blog->Tagline,
-			'Details'        => $Blog->Details,
-			'ImageIconURL'   => NULL,
-			'ImageHeaderURL' => NULL
-		]);
+		$this->SetPayload($Blog->DescribeForPublicAPI());
 
 		return;
 	}
@@ -157,10 +148,12 @@ extends Atlantis\ProtectedAPI {
 	void {
 
 		($this->Data)
+		->Editor(Common\Datafilters::TrimmedText(...))
 		->BlogID(Common\Datafilters::TypeInt(...))
 		->Title(Common\Datafilters::TrimmedText(...))
 		->Alias(Common\Datafilters::TrimmedText(...))
-		->Content(Common\Datafilters::TrimmedText(...));
+		->Content(Common\Datafilters::TrimmedText(...))
+		->CoverImageID(Common\Datafilters::TrimmedText(...));
 
 		////////
 
@@ -178,21 +171,33 @@ extends Atlantis\ProtectedAPI {
 		$this->Quit(2, 'user does not have blog access');
 
 		if(!$BlogUser->CanWrite())
-		$this->Quit(3, 'user does not have blog writer access');
+		$this->Quit(3, 'user does not have blog write access');
 
 		////////
 
 		try {
-			$Post = Blog\Post::Insert([
-				'BlogID'  => $BlogUser->BlogID,
-				'UserID'  => $BlogUser->UserID,
-				'Title'   => $this->Data->Title,
-				'Alias'   => $this->Data->Alias,
-				'Content' => $this->Data->Content
-			]);
+			$Content = match($this->Data->Editor) {
+				'link'
+				=> Blog\Struct\EditorLink::New(
+					$this->Data->Title,
+					$this->Data->Date,
+					$this->Data->URL,
+					$this->Data->Excerpt,
+					$this->Data->Content
+				),
 
-			$Post->Update([
-				'ContentHTML' => $Post->ParseContent($this->Data->Content)
+				default
+				=> $this->Data->Content
+			};
+
+			$Post = Blog\Post::Insert([
+				'BlogID'       => $BlogUser->BlogID,
+				'UserID'       => $BlogUser->UserID,
+				'Editor'       => $this->Data->Editor,
+				'Title'        => $this->Data->Title,
+				'Alias'        => $this->Data->Alias,
+				'CoverImageID' => $this->Data->CoverImageID,
+				'Content'      => $Content
 			]);
 		}
 

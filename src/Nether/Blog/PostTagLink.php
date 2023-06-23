@@ -7,46 +7,67 @@ use Nether\Common;
 use Nether\Database;
 
 class PostTagLink
-extends Atlantis\Media\TagLink {
+extends Atlantis\Tag\EntityLink {
 
-	const
-	LinkType = 'blogpost';
-
-	////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////
-
+	#[Atlantis\Meta\TagEntityProperty('blogpost')]
 	public Post
 	$Post;
 
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
 
-	protected function
-	OnReady(Common\Prototype\ConstructArgs $Args):
+	static public function
+	JoinExtendTables(Database\Verse $SQL, string $JAlias='Main', ?string $TPre=NULL):
 	void {
-		parent::OnReady($Args);
 
-		if($Args->InputHas('ENT_ID'))
-		$this->Post = Post::FromPrefixedDataset($Args->Input, 'ENT_');
+		parent::JoinExtendTables($SQL, $JAlias, $TPre);
+
+		$Table = static::GetTableInfo();
+		$TPre = $Table->GetPrefixedAlias($TPre);
+		$JAlias = $Table->GetPrefixedAlias($JAlias);
+
+		Post::JoinMainTables($SQL, $JAlias, 'EntityUUID', $TPre);
+		Post::JoinExtendTables($SQL, $TPre, $TPre);
 
 		return;
 	}
 
-	static protected function
-	FindExtendTables(Database\Verse $SQL, Common\Datastore $Input):
+	static public function
+	JoinExtendFields(Database\Verse $SQL, ?string $TPre=NULL):
 	void {
-		parent::FindExtendTables($SQL, $Input);
 
-		Post::JoinMainTables($SQL, 'Main', 'EntityUUID', TAlias: 'ENT');
-		Post::JoinMainFields($SQL, TAlias: 'ENT');
+		parent::JoinExtendFields($SQL, $TPre);
+
+		$Table = static::GetTableInfo();
+		$TPre = $Table->GetPrefixedAlias($TPre);
+
+		Post::JoinMainFields($SQL, $TPre);
+		Post::JoinExtendFields($SQL, $TPre);
 
 		return;
 	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
 
 	static protected function
 	FindExtendSorts(Database\Verse $SQL, Common\Datastore $Input):
 	void {
+
 		parent::FindExtendSorts($SQL, $Input);
+
+		switch($Input['Sort']) {
+			case 'post-newest':
+				$SQL
+				->Sort('BP.TimeCreated', $SQL::SortDesc)
+				->Group('Main.EntityUUID');
+			break;
+			case 'post-oldest':
+				$SQL
+				->Sort('BP.TimeCreated', $SQL::SortAsc)
+				->Group('Main.EntityUUID');
+			break;
+		}
 
 		return;
 	}

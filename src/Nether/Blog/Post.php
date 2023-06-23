@@ -31,10 +31,11 @@ extends Atlantis\Prototype {
 	$UserID;
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE)]
+	#[Database\Meta\ForeignKey('Uploads', 'ID')]
 	#[Common\Meta\PropertyPatchable]
-	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters','TypeIntNullable'])]
+	#[Common\Meta\PropertyFilter([ Common\Datafilters::class, 'TypeIntNullable' ])]
 	public int
-	$ImageID;
+	$CoverImageID;
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE)]
 	public int
@@ -119,11 +120,19 @@ extends Atlantis\Prototype {
 	public User\Entity
 	$User;
 
+	public Atlantis\Media\File
+	$Image;
+
 	public Common\Date
 	$DateCreated;
 
 	public Common\Date
 	$DateUpdated;
+
+	////////
+
+	protected Database\Struct\PrototypeFindResult
+	$Tags;
 
 	////////////////////////////////////////////////////////////////
 	// Common\Prototype Overloads //////////////////////////////////
@@ -141,6 +150,9 @@ extends Atlantis\Prototype {
 		if($Args->InputHas('U_ID'))
 		$this->User = User\Entity::FromPrefixedDataset($Args->Input, 'U_');
 
+		if($Args->InputHas('UP_ID'))
+		$this->Image = Atlantis\Media\File::FromPrefixedDataset($Args->Input, 'UP_');
+
 		return;
 	}
 
@@ -157,9 +169,50 @@ extends Atlantis\Prototype {
 		$Output['Alias'] = Common\Datafilters::SlottableKey($Output['Title']);
 
 		if(array_key_exists('Content', $Output))
-		$Output['ContentHTML'] = $this->ParseContent($Output['Content']);
+		$Output['Content'] = match($this->Editor) {
+			'link'
+			=> Struct\EditorLink::New(
+				$Input['Title'],
+				$Input['Date'],
+				$Input['URL'],
+				$Input['Excerpt'],
+				$Input['Content']
+			),
+
+			default
+			=> $Input['Content']
+		};
 
 		return $Output;
+	}
+
+	public function
+	Update(iterable $Dataset):
+	static {
+
+		$Dataset = (array)$Dataset;
+
+		////////
+
+		if(array_key_exists('Content', $Dataset))
+		$Dataset['ContentHTML'] = $this->ParseContent($Dataset['Content']);
+
+		////////
+
+		return parent::Update($Dataset);
+	}
+
+	////////////////////////////////////////////////////////////////
+	// Atlantis\Prototype Overloads ////////////////////////////////
+
+	public function
+	DescribeForPublicAPI():
+	array {
+
+		return [
+			'Title'   => $this->Title,
+			'Content' => $this->ContentHTML
+		];
 	}
 
 	////////////////////////////////////////////////////////////////
@@ -223,6 +276,41 @@ extends Atlantis\Prototype {
 		);
 	}
 
+	public function
+	GetCoverImageURL():
+	?string {
+
+		if(isset($this->Image))
+		return $this->Image->GetPublicURL();
+
+		return NULL;
+	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
+	public function
+	FetchTags():
+	Database\Struct\PrototypeFindResult {
+
+		return PostTagLink::Find([
+			'EntityUUID' => $this->UUID,
+			'Limit'      => 0
+		]);
+	}
+
+	public function
+	GetTags():
+	Database\Struct\PrototypeFindResult {
+
+		if(isset($this->Tags))
+		return $this->Tags;
+
+		$this->Tags = $this->FetchTags();
+
+		return $this->Tags;
+	}
+
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
 
@@ -237,13 +325,24 @@ extends Atlantis\Prototype {
 	}
 
 	public function
-	ParseContent(string $Input):
+	ParseContent(?string $Input=NULL, ?string $Editor=NULL):
 	?string {
 
-		if($this->Editor === 'json')
-		return $this->ParseContentAsJSON($Input);
+		$Input ??= $this->Content;
+		$Editor ??= $this->Editor;
 
-		return $this->ParseContentAsHTML($Input);
+		////////
+
+		return match($Editor) {
+			'json'
+			=> $this->ParseContentAsJSON($Input),
+
+			'link'
+			=> $this->ParseContentAsLink($Input),
+
+			default
+			=> $this->ParseContentAsHTML($Input)
+		};
 	}
 
 	public function
@@ -256,6 +355,17 @@ extends Atlantis\Prototype {
 	}
 
 	public function
+	ParseContentAsLink(string $Input):
+	string {
+
+		ob_start();
+		Common\Dump::Var($Input, TRUE);
+		$Output = ob_get_clean();
+
+		return $Output;
+	}
+
+	public function
 	ParseContentAsHTML(string $Input):
 	string {
 
@@ -264,6 +374,17 @@ extends Atlantis\Prototype {
 		// ...
 
 		return $Output;
+	}
+
+	public function
+	UpdateHTML():
+	static {
+
+		$this->Update([
+			'ContentHTML' => $this->ParseContent()
+		]);
+
+		return $this;
 	}
 
 	////////////////////////////////////////////////////////////////
@@ -283,6 +404,9 @@ extends Atlantis\Prototype {
 		User\Entity::JoinMainTables($SQL, $JAlias, 'UserID', $TPre);
 		User\Entity::JoinExtendTables($SQL, $TPre, $TPre);
 
+		Atlantis\Media\File::JoinMainTables($SQL, $JAlias, 'CoverImageID', $TPre);
+
+
 		return;
 	}
 
@@ -298,6 +422,8 @@ extends Atlantis\Prototype {
 
 		User\Entity::JoinMainFields($SQL, $TPre);
 		User\Entity::JoinExtendFields($SQL, $TPre);
+
+		Atlantis\Media\File::JoinMainFields($SQL, $TPre);
 
 		return;
 	}
@@ -349,6 +475,7 @@ extends Atlantis\Prototype {
 	?static {
 
 		$Now = time();
+		$Post = NULL;
 
 		$Data = new Common\Datastore($Input);
 		$Data->BlendRight([
@@ -384,7 +511,10 @@ extends Atlantis\Prototype {
 
 		////////
 
-		return parent::Insert($Data);
+		$Post = parent::Insert($Data);
+		$Post->UpdateHTML();
+
+		return $Post;
 	}
 
 }
