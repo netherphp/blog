@@ -6,6 +6,8 @@ use Nether\Atlantis;
 use Nether\Common;
 use Nether\Database;
 
+use Exception;
+
 class PostTagLink
 extends Atlantis\Tag\EntityLink {
 

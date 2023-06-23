@@ -129,11 +129,6 @@ extends Atlantis\Prototype {
 	public Common\Date
 	$DateUpdated;
 
-	////////
-
-	protected Database\Struct\PrototypeFindResult
-	$Tags;
-
 	////////////////////////////////////////////////////////////////
 	// Common\Prototype Overloads //////////////////////////////////
 
@@ -284,31 +279,6 @@ extends Atlantis\Prototype {
 		return $this->Image->GetPublicURL();
 
 		return NULL;
-	}
-
-	////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////
-
-	public function
-	FetchTags():
-	Database\Struct\PrototypeFindResult {
-
-		return PostTagLink::Find([
-			'EntityUUID' => $this->UUID,
-			'Limit'      => 0
-		]);
-	}
-
-	public function
-	GetTags():
-	Database\Struct\PrototypeFindResult {
-
-		if(isset($this->Tags))
-		return $this->Tags;
-
-		$this->Tags = $this->FetchTags();
-
-		return $this->Tags;
 	}
 
 	////////////////////////////////////////////////////////////////
