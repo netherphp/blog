@@ -47,7 +47,8 @@ extends Atlantis\ProtectedAPI {
 		->Title(Common\Datafilters::TrimmedText(...))
 		->Alias(Common\Datafilters::TrimmedText(...))
 		->Tagline(Common\Datafilters::StrippedText(...))
-		->Details(Common\Datafilters::TrimmedText(...));
+		->Details(Common\Datafilters::TrimmedText(...))
+		->CoverImageID(Common\Datafilters::TypeIntNullable(...));
 
 		////////
 
@@ -153,7 +154,7 @@ extends Atlantis\ProtectedAPI {
 		->Title(Common\Datafilters::TrimmedText(...))
 		->Alias(Common\Datafilters::TrimmedText(...))
 		->Content(Common\Datafilters::TrimmedText(...))
-		->CoverImageID(Common\Datafilters::TrimmedText(...));
+		->CoverImageID(Common\Datafilters::TypeIntNullable(...));
 
 		////////
 
@@ -261,6 +262,38 @@ extends Atlantis\ProtectedAPI {
 	BlogPostDelete():
 	void {
 
+		($this->Data)
+		->ID(Common\Datafilters::TypeInt(...));
+
+		////////
+
+		if(!$this->Data->ID)
+		$this->Quit(1, 'no ID specified');
+
+		$Post = Blog\Post::GetByID($this->Data->ID);
+
+		if(!$Post)
+		$this->Quit(2, 'post not found');
+
+		////////
+
+		$BlogUser = Blog\BlogUser::GetByPair(
+			$Post->BlogID,
+			$this->User->ID
+		);
+
+		if(!$BlogUser)
+		$this->Quit(3, 'user does not have any blog access');
+
+		if(!$Post->CanUserEdit($BlogUser))
+		$this->Quit(3, 'user does not have blog edit access');
+
+		////////
+
+		$Goto = $Post->Blog->GetURL();
+		$Post->Drop();
+
+		$this->SetGoto($Goto);
 		return;
 	}
 

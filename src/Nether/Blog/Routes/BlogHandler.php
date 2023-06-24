@@ -30,7 +30,9 @@ extends Atlantis\PublicWeb {
 			=> $Key < 4
 		);
 
-		$this->Surface->Area('blog/index', [
+		($this->Surface)
+		->Set('Page.Title', $Blog->Title)
+		->Area('blog/index', [
 			'Blog'         => $Blog,
 			'BlogUser'     => $BlogUser,
 			'Posts'        => $Posts,
@@ -73,7 +75,13 @@ extends Atlantis\PublicWeb {
 		if($this->User)
 		$BlogUser = $Post->Blog->GetUser($this->User->ID);
 
-		$this->Surface->Area('blog/view', [
+		($this->Surface)
+		->Set('Page.Title', sprintf(
+			'%s - %s',
+			$Post->Title,
+			$Post->Blog->Title
+		))
+		->Area('blog/view', [
 			'Blog'     => $Post->Blog,
 			'Post'     => $Post,
 			'BlogUser' => $BlogUser
