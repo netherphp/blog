@@ -45,6 +45,7 @@ implements
 
 		$App = $Argv['App'];
 
+		BlogTagLink::RegisterType();
 		PostTagLink::RegisterType();
 
 		if($App->Router->GetSource() === 'dirscan') {

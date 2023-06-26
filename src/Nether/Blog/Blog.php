@@ -237,6 +237,61 @@ extends Atlantis\Prototype {
 		return '';
 	}
 
+	public function
+	FetchTaggingUpdate():
+	Common\Datastore {
+
+		$Output = new Common\Datastore;
+		$Tag = NULL;
+
+		// first fetch an index of all the tags this blog already has
+		// assigned to it.
+
+		$Old = array_flip(
+			$this
+			->GetTags()
+			->Filter(fn(Atlantis\Tag\Entity $T)=> $T->Type === 'blog')
+			->Remap(fn(Atlantis\Tag\Entity $T)=> $T->ID)
+			->GetData()
+		);
+
+		// now fetch a list of all the tags used by posts on this blog.
+
+		$New = PostTagLink::Find([
+			'BlogID' => $this->ID,
+			'Remappers' => PostTagLink::KeepTheTag(...)
+		]);
+
+		////////
+
+		// add new tags.
+
+		foreach($New as $Tag) {
+			/** @var Atlantis\Tag\Entity $Tag */
+
+			// if we already have this tag.
+
+			if(array_key_exists($Tag->ID, $Old)) {
+				unset($Old[$Tag->ID]);
+				continue;
+			}
+
+			// we do not yet have this tag.
+
+			BlogTagLink::Insert([
+				'TagID'      => $Tag->ID,
+				'EntityUUID' => $this->UUID
+			]);
+		}
+
+		// remove stale tags.
+
+		foreach(array_flip($Old) as $Tag)
+		BlogTagLink::DeleteByPair($Tag, $this->UUID);
+
+		return $Output;
+	}
+
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
 

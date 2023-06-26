@@ -8,12 +8,12 @@ use Nether\Database;
 
 use Exception;
 
-class PostTagLink
+class BlogTagLink
 extends Atlantis\Tag\EntityLink {
 
-	#[Atlantis\Meta\TagEntityProperty('blogpost')]
-	public Post
-	$Post;
+	#[Atlantis\Meta\TagEntityProperty('blog')]
+	public Blog
+	$Blog;
 
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
@@ -28,8 +28,8 @@ extends Atlantis\Tag\EntityLink {
 		$TPre = $Table->GetPrefixedAlias($TPre);
 		$JAlias = $Table->GetPrefixedAlias($JAlias);
 
-		Post::JoinMainTables($SQL, $JAlias, 'EntityUUID', $TPre);
-		Post::JoinExtendTables($SQL, $TPre, $TPre);
+		Blog::JoinMainTables($SQL, $JAlias, 'EntityUUID', $TPre);
+		Blog::JoinExtendTables($SQL, $TPre, $TPre);
 
 		return;
 	}
@@ -43,37 +43,14 @@ extends Atlantis\Tag\EntityLink {
 		$Table = static::GetTableInfo();
 		$TPre = $Table->GetPrefixedAlias($TPre);
 
-		Post::JoinMainFields($SQL, $TPre);
-		Post::JoinExtendFields($SQL, $TPre);
+		Blog::JoinMainFields($SQL, $TPre);
+		Blog::JoinExtendFields($SQL, $TPre);
 
 		return;
 	}
 
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
-
-	static protected function
-	FindExtendOptions(Common\Datastore $Input):
-	void {
-
-		$Input
-		->Define('BlogID', NULL);
-
-		return;
-	}
-
-	static protected function
-	FindExtendFilters(Database\Verse $SQL, Common\Datastore $Input):
-	void {
-
-		$BlogTable = Blog::GetTableInfo();
-		$BlogPK = $BlogTable->GetAliasedPK();
-
-		if($Input['BlogID'] !== NULL)
-		$SQL->Where("{$BlogPK}=:BlogID");
-
-		return;
-	}
 
 	static protected function
 	FindExtendSorts(Database\Verse $SQL, Common\Datastore $Input):
@@ -82,16 +59,7 @@ extends Atlantis\Tag\EntityLink {
 		parent::FindExtendSorts($SQL, $Input);
 
 		switch($Input['Sort']) {
-			case 'post-newest':
-				$SQL
-				->Sort('BP.TimeCreated', $SQL::SortDesc)
-				->Group('Main.EntityUUID');
-			break;
-			case 'post-oldest':
-				$SQL
-				->Sort('BP.TimeCreated', $SQL::SortAsc)
-				->Group('Main.EntityUUID');
-			break;
+
 		}
 
 		return;

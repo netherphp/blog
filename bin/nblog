@@ -1,0 +1,33 @@
+<?php
+
+use Nether\Console;
+use Nether\Database;
+
+require('vendor/autoload.php');
+
+#[Console\Meta\Value('--db', 'Alias of the DB config to connect and execute this query on.')]
+#[Console\Meta\Toggle('--without-atlantis', 'Do not load Atlantis for configuration.')]
+#[Console\Meta\Error(100, 'No connection for "%s"')]
+class App
+extends Console\Client {
+
+	const
+	AppName    = 'Nether Blog',
+	AppDesc    = 'Blog Util CLI',
+	AppVersion = '5.0.0-dev',
+	AppDebug   = TRUE;
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
+	#[Console\Meta\Command]
+	public function
+	HandleUpdateTagging():
+	int {
+
+		return 0;
+	}
+
+};
+
+(new App)->Run();
