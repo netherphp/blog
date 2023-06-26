@@ -47,7 +47,7 @@ extends Atlantis\Prototype {
 
 	#[Database\Meta\TypeIntTiny(Default: 0, Nullable: FALSE)]
 	#[Common\Meta\PropertyPatchable]
-	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters','TypeInt'])]
+	#[Common\Meta\PropertyFilter([ Common\Datafilters::class, 'TypeInt' ])]
 	public int
 	$Enabled;
 
@@ -405,8 +405,9 @@ extends Atlantis\Prototype {
 	FindExtendOptions(Common\Datastore $Input):
 	void {
 
-		($Input)
+		$Input
 		->Define('BlogID', NULL)
+		->Define('Enabled', 1)
 		->Define('Sort', 'newest');
 
 		return;
@@ -418,6 +419,9 @@ extends Atlantis\Prototype {
 
 		if($Input['BlogID'] !== NULL)
 		$SQL->Where('Main.BlogID=:BlogID');
+
+		if($Input['Enabled'] !== NULL)
+		$SQL->Where('Main.Enabled=:Enabled');
 
 		return;
 	}

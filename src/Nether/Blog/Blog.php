@@ -142,13 +142,14 @@ extends Atlantis\Prototype {
 	}
 
 	public function
-	GetRecentPosts(int $Page=1):
+	GetRecentPosts(int $Page=1, bool $Admin=FALSE):
 	Database\Struct\PrototypeFindResult {
 
 		return Post::Find([
-			'BlogID' => $this->ID,
-			'Page'   => $Page,
-			'Sort'   => 'newest'
+			'BlogID'  => $this->ID,
+			'Enabled' => $Admin ? NULL : 1,
+			'Page'    => $Page,
+			'Sort'    => 'newest'
 		]);
 	}
 

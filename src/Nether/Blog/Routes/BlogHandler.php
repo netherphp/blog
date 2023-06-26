@@ -18,7 +18,7 @@ extends Atlantis\PublicWeb {
 	void {
 
 		$Blog = Blog\Blog::GetByField('Alias', $BlogAlias);
-		$Posts = $Blog->GetRecentPosts();
+		$Posts = $Blog->GetRecentPosts(Admin: $this->IsUserAdmin());
 		$BlogUser = NULL;
 
 		if($this->User)
