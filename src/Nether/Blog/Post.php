@@ -121,7 +121,7 @@ extends Atlantis\Prototype {
 	$User;
 
 	public Atlantis\Media\File
-	$Image;
+	$CoverImage;
 
 	public Common\Date
 	$DateCreated;
@@ -146,7 +146,7 @@ extends Atlantis\Prototype {
 		$this->User = User\Entity::FromPrefixedDataset($Args->Input, 'U_');
 
 		if($Args->InputHas('UP_ID'))
-		$this->Image = Atlantis\Media\File::FromPrefixedDataset($Args->Input, 'UP_');
+		$this->CoverImage = Atlantis\Media\File::FromPrefixedDataset($Args->Input, 'UP_');
 
 		return;
 	}
@@ -272,13 +272,16 @@ extends Atlantis\Prototype {
 	}
 
 	public function
-	GetCoverImageURL():
+	GetCoverImageURL(string $Size='md'):
 	?string {
 
-		if(isset($this->Image))
-		return $this->Image->GetPublicURL();
-
+		if(!isset($this->CoverImage))
 		return NULL;
+
+		$URL = $this->CoverImage->GetPublicURL();
+		$URL = str_replace('original.', "{$Size}.", $URL);
+
+		return $URL;
 	}
 
 	////////////////////////////////////////////////////////////////
