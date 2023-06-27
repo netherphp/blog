@@ -56,8 +56,12 @@ extends Atlantis\Tag\EntityLink {
 	FindExtendOptions(Common\Datastore $Input):
 	void {
 
+		$Input['LinkClass'] = static::class;
+		parent::FindExtendOptions($Input);
+
 		$Input
-		->Define('BlogID', NULL);
+		->Define('BlogID', NULL)
+		->Define('GroupByTag', NULL);
 
 		return;
 	}
@@ -66,11 +70,19 @@ extends Atlantis\Tag\EntityLink {
 	FindExtendFilters(Database\Verse $SQL, Common\Datastore $Input):
 	void {
 
-		$BlogTable = Blog::GetTableInfo();
-		$BlogPK = $BlogTable->GetAliasedPK();
+		$Input['LinkClass'] = static::class;
+		parent::FindExtendFilters($SQL, $Input);
+
+		$PostTable = Post::GetTableInfo();
+		$PostField = $PostTable->GetAliasedField('BlogID');
 
 		if($Input['BlogID'] !== NULL)
-		$SQL->Where("{$BlogPK}=:BlogID");
+		$SQL->Where("{$PostField}=:BlogID");
+
+		if($Input['GroupByTag'] !== NULL)
+		$SQL->Group('Main.TagID');
+
+		//Common\Dump::Var($SQL, TRUE);
 
 		return;
 	}

@@ -24,6 +24,8 @@ extends Atlantis\PublicWeb {
 		if($this->User)
 		$BlogUser = $Blog->GetUser($this->User->ID);
 
+		$BlogTags = $Blog->GetTags();
+
 		// clearly not really the popular posts atm.
 		$Popular = $Posts->Distill(
 			fn(Blog\Post $Post, int $Key)
@@ -35,6 +37,7 @@ extends Atlantis\PublicWeb {
 		->Area('blog/index', [
 			'Blog'         => $Blog,
 			'BlogUser'     => $BlogUser,
+			'BlogTags'     => $BlogTags,
 			'Posts'        => $Posts,
 			'Popular'      => $Popular
 		]);

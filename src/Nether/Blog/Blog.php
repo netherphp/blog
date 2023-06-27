@@ -238,10 +238,9 @@ extends Atlantis\Prototype {
 	}
 
 	public function
-	FetchTaggingUpdate():
-	Common\Datastore {
+	UpdateTags():
+	static {
 
-		$Output = new Common\Datastore;
 		$Tag = NULL;
 
 		// first fetch an index of all the tags this blog already has
@@ -258,11 +257,10 @@ extends Atlantis\Prototype {
 		// now fetch a list of all the tags used by posts on this blog.
 
 		$New = PostTagLink::Find([
-			'BlogID' => $this->ID,
-			'Remappers' => PostTagLink::KeepTheTag(...)
+			'BlogID'     => $this->ID,
+			'Remappers'  => PostTagLink::KeepTheTag(...),
+			'GroupByTag' => TRUE
 		]);
-
-		////////
 
 		// add new tags.
 
@@ -289,7 +287,7 @@ extends Atlantis\Prototype {
 		foreach(array_flip($Old) as $Tag)
 		BlogTagLink::DeleteByPair($Tag, $this->UUID);
 
-		return $Output;
+		return $this;
 	}
 
 	////////////////////////////////////////////////////////////////

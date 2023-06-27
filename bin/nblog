@@ -1,5 +1,7 @@
 <?php
 
+use Nether\Atlantis;
+use Nether\Blog;
 use Nether\Console;
 use Nether\Database;
 
@@ -17,13 +19,37 @@ extends Console\Client {
 	AppVersion = '5.0.0-dev',
 	AppDebug   = TRUE;
 
+	protected Atlantis\Engine
+	$App;
+
+	protected function
+	OnRun():
+	void {
+	/*//
+	@date 2023-01-04
+	//*/
+
+		$this->App = new Nether\Atlantis\Engine(getcwd());
+
+		return;
+	}
+
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
 
-	#[Console\Meta\Command]
+	#[Console\Meta\Command('update-tags')]
 	public function
-	HandleUpdateTagging():
+	HandleUpdateTags():
 	int {
+
+		$Blogs = Blog\Blog::Find([ 'Limit'=> 0 ]);
+
+		foreach($Blogs as $Blog) {
+			/** @var Blog\Blog $Blog */
+
+			$this->PrintLn($Blog->Title);
+			$Blog->UpdateTags();
+		}
 
 		return 0;
 	}
