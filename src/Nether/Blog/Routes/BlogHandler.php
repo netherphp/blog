@@ -79,6 +79,7 @@ extends Atlantis\PublicWeb {
 		$BlogUser = $Post->Blog->GetUser($this->User->ID);
 
 		($this->Surface)
+		->Set('Page.ImageURL', new Atlantis\WebURL($Post->GetCoverImageURL('lg') ?? ''))
 		->Set('Page.Title', sprintf(
 			'%s - %s',
 			$Post->Title,

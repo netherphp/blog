@@ -34,7 +34,7 @@ extends Atlantis\Prototype {
 	#[Database\Meta\ForeignKey('Uploads', 'ID')]
 	#[Common\Meta\PropertyPatchable]
 	#[Common\Meta\PropertyFilter([ Common\Datafilters::class, 'TypeIntNullable' ])]
-	public int
+	public ?int
 	$CoverImageID;
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE)]
