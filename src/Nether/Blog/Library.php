@@ -19,7 +19,9 @@ implements
 	const
 	ConfEnable       = 'Nether.Blog.Enable',
 	ConfBlogsPerUser = 'Nether.Blog.BlogsPerUser',
-	ConfStorageKey   = 'Nether.Blog.StorageKey';
+	ConfStorageKey   = 'Nether.Blog.StorageKey',
+	ConfBlogURL      = 'Nether.Blog.BlogURL',
+	ConfPostURL      = 'Nether.Blog.PostURL';
 
 	const
 	AccessBlogCreate = 'Nether.Blog.Create';
@@ -33,7 +35,9 @@ implements
 
 		static::$Config->BlendRight([
 			static::ConfEnable     => TRUE,
-			static::ConfStorageKey => 'Default'
+			static::ConfStorageKey => 'Default',
+			static::ConfBlogURL    => '/+:BlogAlias:',
+			static::ConfPostURL    => '/+:BlogAlias:/:PostID:/:PostAlias:'
 		]);
 
 		return;

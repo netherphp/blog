@@ -10,8 +10,8 @@ use Nether\Common;
 class BlogHandler
 extends Atlantis\PublicWeb {
 
+	#[Avenue\Meta\RouteHandler('@Nether.Blog.BlogURL')]
 	#[Avenue\Meta\RouteHandler('/+:BlogAlias:')]
-	#[Avenue\Meta\RouteHandler('/blog/:BlogAlias:')]
 	#[Avenue\Meta\ConfirmWillAnswerRequest]
 	public function
 	Index(string $BlogAlias):
@@ -64,10 +64,9 @@ extends Atlantis\PublicWeb {
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
 
+	#[Avenue\Meta\RouteHandler('@Nether.Blog.PostURL')]
 	#[Avenue\Meta\RouteHandler('/+:BlogAlias:/:PostID:')]
 	#[Avenue\Meta\RouteHandler('/+:BlogAlias:/:PostID:/:PostAlias:')]
-	#[Avenue\Meta\RouteHandler('/blog/:BlogAlias:/:PostID:')]
-	#[Avenue\Meta\RouteHandler('/blog/:BlogAlias:/:PostID:/:PostAlias:')]
 	#[Avenue\Meta\ConfirmWillAnswerRequest]
 	public function
 	ViewPost(string $BlogAlias, int $PostID, ?string $PostAlias, Blog\Post $Post):

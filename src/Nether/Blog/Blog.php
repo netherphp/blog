@@ -157,7 +157,7 @@ extends Atlantis\Prototype {
 	GetURL():
 	string {
 
-		$Format = '/+:BlogAlias:';
+		$Format = Library::Get(Library::ConfBlogURL);
 
 		$Tokens = [
 			':BlogID:'    => $this->ID,
@@ -178,7 +178,7 @@ extends Atlantis\Prototype {
 	GetPostURL(Post $Post):
 	string {
 
-		$Format = '/+:BlogAlias:/:PostID:/:PostAlias:';
+		$Format = Library::Get(Library::ConfPostURL);
 
 		$Tokens = [
 			':BlogID:'    => $this->ID,
