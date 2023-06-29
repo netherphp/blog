@@ -11,7 +11,6 @@ class BlogHandler
 extends Atlantis\PublicWeb {
 
 	#[Avenue\Meta\RouteHandler('@Nether.Blog.BlogURL')]
-	#[Avenue\Meta\RouteHandler('/+:BlogAlias:')]
 	#[Avenue\Meta\ConfirmWillAnswerRequest]
 	public function
 	Index(string $BlogAlias):
@@ -54,7 +53,7 @@ extends Atlantis\PublicWeb {
 		////////
 
 		if(!$Blog)
-		return Avenue\Response::CodeNotFound;
+		return Avenue\Response::CodeNope;
 
 		////////
 
@@ -65,8 +64,6 @@ extends Atlantis\PublicWeb {
 	////////////////////////////////////////////////////////////////
 
 	#[Avenue\Meta\RouteHandler('@Nether.Blog.PostURL')]
-	#[Avenue\Meta\RouteHandler('/+:BlogAlias:/:PostID:')]
-	#[Avenue\Meta\RouteHandler('/+:BlogAlias:/:PostID:/:PostAlias:')]
 	#[Avenue\Meta\ConfirmWillAnswerRequest]
 	public function
 	ViewPost(string $BlogAlias, int $PostID, ?string $PostAlias, Blog\Post $Post):
@@ -104,7 +101,7 @@ extends Atlantis\PublicWeb {
 		// anywhere at all.
 
 		if(!$Post)
-		return Avenue\Response::CodeNotFound;
+		return Avenue\Response::CodeNope;
 
 		// if this post has been linked to the wrong blog (changing id in
 		// the url), or the blog has been renamed, or literally any other
