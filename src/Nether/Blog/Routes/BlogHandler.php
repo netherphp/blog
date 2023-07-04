@@ -16,8 +16,16 @@ extends Atlantis\PublicWeb {
 	Index(string $BlogAlias):
 	void {
 
+		($this->Data)
+		->Page(Common\Datafilters::PageNumber(...));
+
 		$Blog = Blog\Blog::GetByField('Alias', $BlogAlias);
-		$Posts = $Blog->GetRecentPosts(Admin: $this->IsUserAdmin());
+
+		$Posts = $Blog->GetRecentPosts(
+			Page: $this->Data->Page,
+			Admin: $this->IsUserAdmin()
+		);
+
 		$BlogUser = NULL;
 
 		if($this->User)
