@@ -13,6 +13,7 @@ class Library
 extends Common\Library
 implements
 	Atlantis\Plugins\DashboardSidebarInterface,
+	Atlantis\Plugins\DashboardElementInterface,
 	Atlantis\Plugins\AccessTypeDefineInterface,
 	Atlantis\Plugins\UploadHandlerInterface {
 
@@ -85,6 +86,18 @@ implements
 
 		if($App->User)
 		$Sidebar->Push(new Dashboard\BlogSidebarGroup($App));
+
+		return;
+	}
+
+	public function
+	OnDashboardElement(Atlantis\Engine $App, Common\Datastore $Elements):
+	void {
+
+		if(!$App->User)
+		return;
+
+		$Elements->Push(new Dashboard\BlogElement($App));
 
 		return;
 	}
