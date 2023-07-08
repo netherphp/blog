@@ -15,11 +15,6 @@ use Exception;
 class Post
 extends Atlantis\Prototype {
 
-	#[Database\Meta\TypeIntBig(Unsigned: TRUE, AutoInc: TRUE)]
-	#[Database\Meta\PrimaryKey]
-	public int
-	$ID;
-
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE)]
 	#[Database\Meta\ForeignKey('Blogs', 'ID')]
 	public int
@@ -221,6 +216,9 @@ extends Atlantis\Prototype {
 			'editorjs'
 			=> $this->GetExcerptFromJSON(),
 
+			'link'
+			=> $this->GetExcerptFromLink(),
+
 			default
 			=> $this->GetExcerptFromHTML()
 		};
@@ -233,6 +231,15 @@ extends Atlantis\Prototype {
 	string {
 
 		return '';
+	}
+
+	protected function
+	GetExcerptFromLink():
+	string {
+
+		$Link = Struct\EditorLink::FromJSON($this->Content);
+
+		return $Link->Excerpt;
 	}
 
 	protected function
@@ -416,6 +423,8 @@ extends Atlantis\Prototype {
 	static protected function
 	FindExtendFilters(Database\Verse $SQL, Common\Datastore $Input):
 	void {
+
+		parent::FindExtendFilters($SQL, $Input);
 
 		if($Input['BlogID'] !== NULL)
 		$SQL->Where('Main.BlogID=:BlogID');
