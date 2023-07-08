@@ -209,37 +209,45 @@ extends Atlantis\Prototype {
 	////////////////////////////////////////////////////////////////
 
 	public function
-	GetExcerpt():
+	GetExcerpt(int $Len=100):
 	string {
 
 		$Output = match($this->Editor) {
 			'editorjs'
-			=> $this->GetExcerptFromJSON(),
+			=> $this->GetExcerptFromJSON($Len),
 
 			'link'
-			=> $this->GetExcerptFromLink(),
+			=> $this->GetExcerptFromLink($Len),
 
 			default
-			=> $this->GetExcerptFromHTML()
+			=> $this->GetExcerptFromHTML($Len)
 		};
 
 		return $Output;
 	}
 
 	protected function
-	GetExcerptFromJSON():
+	GetExcerptFromJSON(int $Len=100):
 	string {
 
 		return '';
 	}
 
 	protected function
-	GetExcerptFromLink():
+	GetExcerptFromLink(int $Len=100):
 	string {
 
 		$Link = Struct\EditorLink::FromJSON($this->Content);
 
-		return $Link->Excerpt;
+		$Output = preg_replace('#<[Bb][Rr] ?/?>#', ' ', $Link->Excerpt);
+		$Bits = explode(' ', strip_tags($Output), ($Len + 1));
+		$Output = join(' ', array_slice($Bits, 0, $Len));
+
+		if(count($Bits) > $Len)
+		if(!str_ends_with($Output, '.'))
+		$Output .= '...';
+
+		return $Output;
 	}
 
 	protected function
@@ -247,7 +255,6 @@ extends Atlantis\Prototype {
 	string {
 
 		$Output = preg_replace('#<[Bb][Rr] ?/?>#', ' ', $this->Content);
-
 		$Bits = explode(' ', strip_tags($Output), ($Len + 1));
 		$Output = join(' ', array_slice($Bits, 0, $Len));
 
