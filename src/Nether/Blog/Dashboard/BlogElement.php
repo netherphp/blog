@@ -46,7 +46,7 @@ extends Atlantis\Dashboard\Element {
 		//if($this->UserCanAdmin)
 		//$this->Columns = min(3, ($this->Columns + 1));
 
-		$this->Columns = 'full';
+		$this->Columns = 'half';
 
 		return;
 	}
