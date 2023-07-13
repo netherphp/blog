@@ -289,13 +289,21 @@ extends Atlantis\Prototype {
 	GetCoverImageURL(string $Size='md'):
 	?string {
 
-		if(!isset($this->CoverImage))
+		$URL = NULL;
+
+		if(isset($this->CoverImage)) {
+			$URL = $this->CoverImage->GetPublicURL();
+			$URL = str_replace('original.', "{$Size}.", $URL);
+			return $URL;
+		}
+
+		if(isset($this->Blog->ImageHeader)) {
+			$URL = $this->Blog->ImageHeader->GetPublicURL();
+			$URL = str_replace('original.', "{$Size}.", $URL);
+			return $URL;
+		}
+
 		return NULL;
-
-		$URL = $this->CoverImage->GetPublicURL();
-		$URL = str_replace('original.', "{$Size}.", $URL);
-
-		return $URL;
 	}
 
 	////////////////////////////////////////////////////////////////

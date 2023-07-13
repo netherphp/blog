@@ -74,6 +74,24 @@ implements Stringable {
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
 
+	public function
+	GetExcerpt(int $Len=100):
+	string {
+
+		$Output = preg_replace('#<[Bb][Rr] ?/?>#', ' ', $this->Excerpt);
+		$Bits = explode(' ', strip_tags($Output), ($Len + 1));
+		$Output = join(' ', array_slice($Bits, 0, $Len));
+
+		if(count($Bits) > $Len)
+		if(!str_ends_with($Output, '.'))
+		$Output .= '...';
+
+		return $Output;
+	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
 	static public function
 	FromJSON(string $JSON):
 	static {

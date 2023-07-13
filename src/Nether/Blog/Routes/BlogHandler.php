@@ -17,21 +17,42 @@ extends Atlantis\PublicWeb {
 	void {
 
 		($this->Data)
-		->Page(Common\Datafilters::PageNumber(...));
+		->Page(Common\Filters\Numbers::Page(...))
+		->Drafts(Common\Filters\Numbers::BoolNullable(...));
+
+		$Blog = NULL;
+		$BlogUser = NULL;
+		$Posts = NULL;
+		$ShowingDrafts = FALSE;
+
+		////////
 
 		$Blog = Blog\Blog::GetByField('Alias', $BlogAlias);
-
-		$Posts = $Blog->GetRecentPosts(
-			Page: $this->Data->Page,
-			Admin: $this->IsUserAdmin()
-		);
-
-		$BlogUser = NULL;
 
 		if($this->User)
 		$BlogUser = $Blog->GetUser($this->User->ID);
 
+		if($BlogUser && $BlogUser->CanWrite()) {
+			if($this->Data->Exists('Drafts'))
+			$ShowingDrafts = (FALSE
+				|| $this->Data->Drafts
+				|| (bool)$this->App->GetLocalData('Blog.User.OptShowDrafts')
+			);
+		}
+
+		////////
+
 		$BlogTags = $Blog->GetTags();
+
+		////////
+
+		//if($this->App->Local)
+		//$this->App->GetLocalData('Blog.Index.OptShowDrafts');
+
+		$Posts = $Blog->GetRecentPosts(
+			Page: $this->Data->Page,
+			Drafts: $ShowingDrafts
+		);
 
 		// clearly not really the popular posts atm.
 		$Popular = $Posts->Distill(
@@ -39,14 +60,18 @@ extends Atlantis\PublicWeb {
 			=> $Key < 4
 		);
 
+		////////
+
+
 		($this->Surface)
 		->Set('Page.Title', $Blog->Title)
 		->Area('blog/index', [
-			'Blog'         => $Blog,
-			'BlogUser'     => $BlogUser,
-			'BlogTags'     => $BlogTags,
-			'Posts'        => $Posts,
-			'Popular'      => $Popular
+			'Blog'          => $Blog,
+			'BlogUser'      => $BlogUser,
+			'BlogTags'      => $BlogTags,
+			'Posts'         => $Posts,
+			'Popular'       => $Popular,
+			'OptShowDrafts' => $ShowingDrafts
 		]);
 
 		return;
