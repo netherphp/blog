@@ -14,8 +14,9 @@ extends Common\Library
 implements
 	Atlantis\Plugins\DashboardSidebarInterface,
 	Atlantis\Plugins\DashboardElementInterface,
-	Atlantis\Plugins\AccessTypeDefineInterface,
-	Atlantis\Plugins\UploadHandlerInterface {
+//	Atlantis\Plugins\AccessTypeDefineInterface,
+	Atlantis\Plugins\UploadHandlerInterface,
+	Atlantis\Plugin\LibraryInterface {
 
 	const
 	ConfEnable       = 'Nether.Blog.Enable',
@@ -27,6 +28,9 @@ implements
 	const
 	AccessBlogCreate = 'Nether.Blog.Create';
 
+	use
+	Atlantis\Plugin\LibraryPackage;
+
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
 
@@ -34,12 +38,24 @@ implements
 	OnLoad(...$Argv):
 	void {
 
-		static::$Config->BlendRight([
+		$App = Atlantis\Engine::From($Argv);
+
+		($App->Config)
+		->BlendRight([
 			static::ConfEnable     => TRUE,
 			static::ConfStorageKey => 'Default',
 			static::ConfBlogURL    => '/+:BlogAlias:',
 			static::ConfPostURL    => '/+:BlogAlias:/:PostID:/:PostAlias:'
 		]);
+
+		($App->Plugins)
+		->Register(
+			Atlantis\Plugins\AccessTypeDefineInterface::class,
+			Plugins\AccessTypeDefine::class
+		);
+
+		BlogTagLink::Register();
+		PostTagLink::Register();
 
 		return;
 	}
@@ -48,10 +64,7 @@ implements
 	OnReady(... $Argv):
 	void {
 
-		$App = $Argv['App'];
-
-		BlogTagLink::RegisterType();
-		PostTagLink::RegisterType();
+		$App = Atlantis\Engine::From($Argv);
 
 		if($App->Router->GetSource() === 'dirscan') {
 			$RouterPath = dirname(__FILE__);
