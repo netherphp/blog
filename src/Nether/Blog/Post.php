@@ -109,14 +109,20 @@ extends Atlantis\Prototype {
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
 
+	#[Database\Meta\TableJoin('BlogID')]
 	public Blog
 	$Blog;
 
+	#[Database\Meta\TableJoin('UserID')]
 	public User\Entity
 	$User;
 
+	#[Database\Meta\TableJoin('CoverImageID')]
 	public Atlantis\Media\File
 	$CoverImage;
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
 
 	public Common\Date
 	$DateCreated;
@@ -386,7 +392,7 @@ extends Atlantis\Prototype {
 	////////////////////////////////////////////////////////////////
 
 	static public function
-	JoinExtendTables(Database\Verse $SQL, string $JAlias='Main', ?string $TPre=NULL):
+	_JoinExtendTables(Database\Verse $SQL, string $JAlias='Main', ?string $TPre=NULL):
 	void {
 
 		$Table = static::GetTableInfo();
@@ -406,7 +412,7 @@ extends Atlantis\Prototype {
 	}
 
 	static public function
-	JoinExtendFields(Database\Verse $SQL, ?string $TPre=NULL):
+	_JoinExtendFields(Database\Verse $SQL, ?string $TPre=NULL):
 	void {
 
 		$Table = static::GetTableInfo();

@@ -101,9 +101,11 @@ extends Atlantis\Prototype {
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
 
+	#[Database\Meta\TableJoin('ImageHeaderID', 'IH')]
 	public ?Atlantis\Media\File
 	$ImageHeader = NULL;
 
+	#[Database\Meta\TableJoin('ImageIconID', 'II')]
 	public ?Atlantis\Media\File
 	$ImageIcon = NULL;
 
@@ -305,7 +307,7 @@ extends Atlantis\Prototype {
 	////////////////////////////////////////////////////////////////
 
 	static public function
-	JoinExtendTables(Database\Verse $SQL, string $JAlias='Main', ?string $TPre=NULL):
+	_JoinExtendTables(Database\Verse $SQL, string $JAlias='Main', ?string $TPre=NULL):
 	void {
 
 		$Table = static::GetTableInfo();
@@ -322,7 +324,7 @@ extends Atlantis\Prototype {
 	}
 
 	static public function
-	JoinExtendFields(Database\Verse $SQL, ?string $TPre=NULL):
+	_JoinExtendFields(Database\Verse $SQL, ?string $TPre=NULL):
 	void {
 
 		$Table = static::GetTableInfo();

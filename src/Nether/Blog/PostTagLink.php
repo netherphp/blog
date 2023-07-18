@@ -12,6 +12,7 @@ class PostTagLink
 extends Atlantis\Tag\EntityLink {
 
 	#[Atlantis\Meta\TagEntityProperty('blogpost')]
+	#[Database\Meta\TableJoin('EntityUUID')]
 	public Post
 	$Post;
 
@@ -19,7 +20,7 @@ extends Atlantis\Tag\EntityLink {
 	////////////////////////////////////////////////////////////////
 
 	static public function
-	JoinExtendTables(Database\Verse $SQL, string $JAlias='Main', ?string $TPre=NULL):
+	_JoinExtendTables(Database\Verse $SQL, string $JAlias='Main', ?string $TPre=NULL):
 	void {
 
 		parent::JoinExtendTables($SQL, $JAlias, $TPre);
@@ -35,7 +36,7 @@ extends Atlantis\Tag\EntityLink {
 	}
 
 	static public function
-	JoinExtendFields(Database\Verse $SQL, ?string $TPre=NULL):
+	_JoinExtendFields(Database\Verse $SQL, ?string $TPre=NULL):
 	void {
 
 		parent::JoinExtendFields($SQL, $TPre);
