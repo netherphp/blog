@@ -66,15 +66,13 @@ extends Atlantis\Prototype {
 	public int
 	$TimeToRead;
 
-	#[Database\Meta\TypeChar(Size: 36)]
-	public string
-	$UUID;
-
 	#[Database\Meta\TypeVarChar(Size: 255)]
+	#[Common\Meta\PropertyListable]
 	public string
 	$Alias;
 
 	#[Database\Meta\TypeVarChar(Size: 255)]
+	#[Common\Meta\PropertyListable]
 	#[Common\Meta\PropertyPatchable]
 	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters','TrimmedText'])]
 	public string
@@ -95,12 +93,14 @@ extends Atlantis\Prototype {
 	$ContentHTML;
 
 	#[Database\Meta\TypeIntTiny(Default: 0, Nullable: FALSE)]
+	#[Common\Meta\PropertyListable]
 	#[Common\Meta\PropertyPatchable]
 	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters','TypeInt'])]
 	public int
 	$OptAdult;
 
 	#[Database\Meta\TypeIntTiny(Default: 0, Nullable: FALSE)]
+	#[Common\Meta\PropertyListable]
 	#[Common\Meta\PropertyPatchable]
 	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters','TypeInt'])]
 	public int
@@ -109,11 +109,12 @@ extends Atlantis\Prototype {
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
 
-	#[Database\Meta\TableJoin('BlogID')]
+	#[Database\Meta\TableJoin('BlogID', Extend: TRUE)]
+	#[Common\Meta\PropertyListable]
 	public Blog
 	$Blog;
 
-	#[Database\Meta\TableJoin('UserID')]
+	#[Database\Meta\TableJoin('UserID', Extend: TRUE)]
 	public User\Entity
 	$User;
 
@@ -205,10 +206,9 @@ extends Atlantis\Prototype {
 	DescribeForPublicAPI():
 	array {
 
-		return [
-			'Title'   => $this->Title,
-			'Content' => $this->ContentHTML
-		];
+		$Data = parent::DescribeForPublicAPI();
+
+		return $Data;
 	}
 
 	////////////////////////////////////////////////////////////////

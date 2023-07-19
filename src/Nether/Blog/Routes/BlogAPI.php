@@ -135,9 +135,7 @@ extends Atlantis\ProtectedAPI {
 
 		////////
 
-		$this->SetPayload([
-			'Post' => $Post
-		]);
+		$this->SetPayload($Post->DescribeForPublicAPI());
 
 		return;
 	}

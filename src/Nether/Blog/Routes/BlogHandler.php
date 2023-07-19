@@ -34,10 +34,7 @@ extends Atlantis\PublicWeb {
 
 		if($BlogUser && $BlogUser->CanWrite()) {
 			if($this->Data->Exists('Drafts'))
-			$ShowingDrafts = (FALSE
-				|| $this->Data->Drafts
-				|| (bool)$this->App->GetLocalData('Blog.User.OptShowDrafts')
-			);
+			$ShowingDrafts = $this->Data->Drafts;
 		}
 
 		////////

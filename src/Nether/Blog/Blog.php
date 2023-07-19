@@ -13,34 +13,29 @@ use Exception;
 class Blog
 extends Atlantis\Prototype {
 
-	#[Database\Meta\TypeIntBig(Unsigned: TRUE, AutoInc: TRUE)]
-	#[Database\Meta\PrimaryKey]
-	public int
-	$ID;
-
-	#[Database\Meta\TypeChar(Size: 36)]
-	public string
-	$UUID;
-
 	#[Database\Meta\TypeChar(Size: 64, Variable: TRUE)]
+	#[Common\Meta\PropertyListable]
 	#[Common\Meta\PropertyPatchable]
 	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters', 'TrimmedText'])]
 	public string
 	$Alias;
 
 	#[Database\Meta\TypeChar(Size: 64, Variable: TRUE)]
+	#[Common\Meta\PropertyListable]
 	#[Common\Meta\PropertyPatchable]
 	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters', 'TrimmedText'])]
 	public string
 	$Title;
 
 	#[Database\Meta\TypeChar(Size: 64, Variable: TRUE)]
+	#[Common\Meta\PropertyListable]
 	#[Common\Meta\PropertyPatchable]
 	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters', 'TrimmedText'])]
 	public ?string
 	$Tagline;
 
 	#[Database\Meta\TypeText]
+	#[Common\Meta\PropertyListable]
 	#[Common\Meta\PropertyPatchable]
 	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters', 'TrimmedText'])]
 	public ?string
@@ -102,10 +97,12 @@ extends Atlantis\Prototype {
 	////////////////////////////////////////////////////////////////
 
 	#[Database\Meta\TableJoin('ImageHeaderID', 'IH')]
+	#[Common\Meta\PropertyListable]
 	public ?Atlantis\Media\File
 	$ImageHeader = NULL;
 
 	#[Database\Meta\TableJoin('ImageIconID', 'II')]
+	#[Common\Meta\PropertyListable]
 	public ?Atlantis\Media\File
 	$ImageIcon = NULL;
 
@@ -132,6 +129,10 @@ extends Atlantis\Prototype {
 	DescribeForPublicAPI():
 	array {
 
+		$Data = parent::DescribeForPublicAPI();
+
+		return $Data;
+
 		return [
 			'ID'             => $this->ID,
 			'URL'            => $this->GetURL(),
@@ -149,7 +150,7 @@ extends Atlantis\Prototype {
 
 		return Post::Find([
 			'BlogID'  => $this->ID,
-			'Enabled' => $Drafts ? NULL : 1,
+			'Enabled' => $Drafts ? 0 : 1,
 			'Page'    => $Page,
 			'Limit'   => $Limit,
 			'Sort'    => 'newest'

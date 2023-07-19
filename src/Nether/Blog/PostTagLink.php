@@ -12,7 +12,7 @@ class PostTagLink
 extends Atlantis\Tag\EntityLink {
 
 	#[Atlantis\Meta\TagEntityProperty('blogpost')]
-	#[Database\Meta\TableJoin('EntityUUID')]
+	#[Database\Meta\TableJoin('EntityUUID', Extend: TRUE)]
 	public Post
 	$Post;
 
