@@ -32,13 +32,18 @@ extends Atlantis\Prototype {
 	public ?int
 	$CoverImageID;
 
-	#[Database\Meta\TypeIntBig(Unsigned: TRUE)]
+	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: NULL)]
 	public int
 	$TimeCreated;
 
-	#[Database\Meta\TypeIntBig(Unsigned: TRUE)]
+	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: NULL)]
 	public int
 	$TimeUpdated;
+
+	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: NULL)]
+	#[Database\Meta\FieldIndex]
+	public int
+	$TimeSorted;
 
 	#[Database\Meta\TypeIntTiny(Default: 0, Nullable: FALSE)]
 	#[Common\Meta\PropertyPatchable]
@@ -125,11 +130,17 @@ extends Atlantis\Prototype {
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
 
+	#[Common\Meta\PropertyFactory('FromTime', 'TimeCreated')]
 	public Common\Date
 	$DateCreated;
 
+	#[Common\Meta\PropertyFactory('FromTime', 'TimeUpdated')]
 	public Common\Date
 	$DateUpdated;
+
+	#[Common\Meta\PropertyFactory('FromTime', 'TimeSorted')]
+	public Common\Date
+	$DateSorted;
 
 	////////////////////////////////////////////////////////////////
 	// Common\Prototype Overloads //////////////////////////////////
@@ -137,9 +148,6 @@ extends Atlantis\Prototype {
 	protected function
 	OnReady(Common\Prototype\ConstructArgs $Args):
 	void {
-
-		$this->DateCreated = Common\Date::FromTime($this->TimeCreated);
-		$this->DateUpdated = Common\Date::FromTime($this->TimeUpdated);
 
 		if($Args->InputHas('BL_ID'))
 		$this->Blog = Blog::FromPrefixedDataset($Args->Input, 'BL_');
@@ -391,6 +399,7 @@ extends Atlantis\Prototype {
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
 
+	#[Common\Meta\Deprecated('2023-07-19', 'TableJoin attribute replaced this')]
 	static public function
 	_JoinExtendTables(Database\Verse $SQL, string $JAlias='Main', ?string $TPre=NULL):
 	void {
@@ -411,6 +420,7 @@ extends Atlantis\Prototype {
 		return;
 	}
 
+	#[Common\Meta\Deprecated('2023-07-19', 'TableJoin attribute replaced this')]
 	static public function
 	_JoinExtendFields(Database\Verse $SQL, ?string $TPre=NULL):
 	void {
@@ -436,7 +446,8 @@ extends Atlantis\Prototype {
 		$Input
 		->Define('BlogID', NULL)
 		->Define('Enabled', 1)
-		->Define('Sort', 'newest');
+		->Define('Sort', 'newest')
+		->Define('Schedule', TRUE);
 
 		return;
 	}
@@ -453,6 +464,13 @@ extends Atlantis\Prototype {
 		if($Input['Enabled'] !== NULL)
 		$SQL->Where('Main.Enabled=:Enabled');
 
+		if($Input['Schedule'] !== NULL) {
+			if($Input['Schedule'] === TRUE) {
+				$SQL->Where('Main.TimeSorted <= :TimeSortedSchedule');
+				$Input[':TimeSortedSchedule'] = Common\Date::CurrentUnixtime();
+			}
+		}
+
 		return;
 	}
 
@@ -462,11 +480,11 @@ extends Atlantis\Prototype {
 
 		switch($Input['Sort']) {
 			case 'newest':
-				$SQL->Sort('Main.TimeCreated', $SQL::SortDesc);
+				$SQL->Sort('Main.TimeSorted', $SQL::SortDesc);
 				break;
 			break;
 			case 'oldest':
-				$SQL->Sort('Main.TimeCreated', $SQL::SortAsc);
+				$SQL->Sort('Main.TimeSorted', $SQL::SortAsc);
 				break;
 			break;
 		}
@@ -481,18 +499,20 @@ extends Atlantis\Prototype {
 	Insert(iterable $Input):
 	?static {
 
-		$Now = time();
+		$Now = Common\Date::CurrentUnixtime();
+		$UUID = Common\UUID::V7();
 		$Post = NULL;
 
 		$Data = new Common\Datastore($Input);
 		$Data->BlendRight([
-			'UUID'        => Common\UUID::V7(),
+			'UUID'        => $UUID,
 			'UserID'      => NULL,
 			'BlogID'      => NULL,
 			'Title'       => NULL,
 			'Alias'       => NULL,
 			'TimeCreated' => $Now,
-			'TimeUpdated' => $Now
+			'TimeUpdated' => $Now,
+			'TimeSorted'  => $Now
 		]);
 
 		////////

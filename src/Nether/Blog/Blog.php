@@ -149,11 +149,12 @@ extends Atlantis\Prototype {
 	Database\Struct\PrototypeFindResult {
 
 		return Post::Find([
-			'BlogID'  => $this->ID,
-			'Enabled' => $Drafts ? 0 : 1,
-			'Page'    => $Page,
-			'Limit'   => $Limit,
-			'Sort'    => 'newest'
+			'BlogID'   => $this->ID,
+			'Enabled'  => $Drafts ? 0 : 1,
+			'Schedule' => $Drafts ? NULL : TRUE,
+			'Page'     => $Page,
+			'Limit'    => $Limit,
+			'Sort'     => 'newest'
 		]);
 	}
 

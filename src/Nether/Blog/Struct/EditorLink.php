@@ -75,6 +75,15 @@ implements Stringable {
 	////////////////////////////////////////////////////////////////
 
 	public function
+	GetTime():
+	int {
+
+		$Date = Common\Date::FromDateString($this->Date);
+
+		return $Date->GetUnixtime();
+	}
+
+	public function
 	GetExcerpt(int $Len=100):
 	string {
 

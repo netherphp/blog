@@ -152,7 +152,11 @@ extends Atlantis\ProtectedAPI {
 		->Title(Common\Datafilters::TrimmedText(...))
 		->Alias(Common\Datafilters::TrimmedText(...))
 		->Content(Common\Datafilters::TrimmedText(...))
-		->CoverImageID(Common\Datafilters::TypeIntNullable(...));
+		->CoverImageID(Common\Datafilters::TypeIntNullable(...))
+		->OptUseLinkDate(Common\Filters\Numbers::BoolType(...));
+
+		$Now = Common\Date::CurrentUnixtime();
+		$TimeSorted = $Now;
 
 		////////
 
@@ -189,9 +193,15 @@ extends Atlantis\ProtectedAPI {
 				=> $this->Data->Content
 			};
 
+			if($Content instanceof Blog\Struct\EditorLink) {
+				if($this->Data->OptUseLinkDate)
+				$TimeSorted = Common\Date::FromDateString($Content->Date)->GetUnixtime();
+			}
+
 			$Post = Blog\Post::Insert([
 				'BlogID'       => $BlogUser->BlogID,
 				'UserID'       => $BlogUser->UserID,
+				'TimeSorted'   => $TimeSorted,
 				'Editor'       => $this->Data->Editor,
 				'Title'        => $this->Data->Title,
 				'Alias'        => $this->Data->Alias,
@@ -220,7 +230,8 @@ extends Atlantis\ProtectedAPI {
 	void {
 
 		($this->Data)
-		->ID(Common\Datafilters::TypeInt(...));
+		->ID(Common\Filters\Numbers::IntType(...))
+		->OptUseLinkDate(Common\Filters\Numbers::BoolType(...));
 
 		////////
 
@@ -247,8 +258,23 @@ extends Atlantis\ProtectedAPI {
 
 		////////
 
-		$Post->Update($Post->Patch($this->Data));
+		$Patchset = $Post->Patch($this->Data);
 
+		if($Post->Editor === 'link') {
+			if($this->Data->OptUseLinkDate)
+			$Patchset['TimeSorted'] = match(TRUE) {
+				(isset($Patchset['Content']) && isset($Patchset['Content']->Date))
+				=> Common\Date::FromDateString($Patchset['Content']->Date)->GetUnixtime(),
+
+				default
+				=> Common\Date::FromDateString(Blog\Struct\EditorLink::FromJSON($Post->Content))->GetUnixtime(),
+			};
+
+			else
+			$Patchset['TimeSorted'] = $Post->TimeCreated;
+		}
+
+		$Post->Update($Patchset);
 		$this->SetGoto($Post->GetURL());
 
 		return;
