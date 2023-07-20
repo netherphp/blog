@@ -4,6 +4,7 @@ namespace Nether\Blog\Dashboard;
 
 use Nether\Atlantis;
 use Nether\Blog;
+use Nether\Common;
 use Nether\Database;
 
 class BlogElement
@@ -11,6 +12,12 @@ extends Atlantis\Dashboard\Element {
 
 	public Database\Struct\PrototypeFindResult
 	$Blogs;
+
+	public Common\Datastore
+	$Hits;
+
+	public Common\Datastore
+	$Visitors;
 
 	public bool
 	$UserCanAdmin;
@@ -23,6 +30,8 @@ extends Atlantis\Dashboard\Element {
 			'Blogs',
 			'blog/dashboard/element/main'
 		);
+
+
 
 		return;
 	}
@@ -41,10 +50,13 @@ extends Atlantis\Dashboard\Element {
 			&& $this->App->User->HasAccessType(Blog\Library::AccessBlogCreate)
 		);
 
-		//$this->Columns = min(3, $this->Blogs->Count());
-
-		//if($this->UserCanAdmin)
-		//$this->Columns = min(3, ($this->Columns + 1));
+		$this->Blogs->Remap(function(Blog\BlogUser $BU) {
+			return (object)[
+				'BlogUser' => $BU,
+				'Hits'     => Atlantis\Struct\TrafficRow::FindCount([ 'PathStart'=> "/{$BU->Blog->Alias}" ]),
+				'Visitors' => Atlantis\Struct\TrafficRow::FindCount([ 'PathStart'=> "/{$BU->Blog->Alias}", 'Group'=> 'visitor' ])
+			];
+		});
 
 		$this->Columns = 'half';
 
