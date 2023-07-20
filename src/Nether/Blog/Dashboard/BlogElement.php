@@ -31,8 +31,6 @@ extends Atlantis\Dashboard\Element {
 			'blog/dashboard/element/main'
 		);
 
-
-
 		return;
 	}
 
@@ -51,11 +49,11 @@ extends Atlantis\Dashboard\Element {
 		);
 
 		$this->Blogs->Remap(function(Blog\BlogUser $BU) {
-			return (object)[
-				'BlogUser' => $BU,
-				'Hits'     => Atlantis\Struct\TrafficRow::FindCount([ 'PathStart'=> "/{$BU->Blog->Alias}" ]),
-				'Visitors' => Atlantis\Struct\TrafficRow::FindCount([ 'PathStart'=> "/{$BU->Blog->Alias}", 'Group'=> 'visitor' ])
-			];
+			return new Blog\Struct\DashboardBlogInfo(
+				$BU,
+				Atlantis\Struct\TrafficRow::FindCount([ 'PathStart'=> "/{$BU->Blog->Alias}" ]),
+				Atlantis\Struct\TrafficRow::FindCount([ 'PathStart'=> "/{$BU->Blog->Alias}", 'Group'=> 'visitor' ])
+			);
 		});
 
 		$this->Columns = 'half';
