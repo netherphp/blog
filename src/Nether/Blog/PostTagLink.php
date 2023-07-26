@@ -6,8 +6,6 @@ use Nether\Atlantis;
 use Nether\Common;
 use Nether\Database;
 
-use Exception;
-
 class PostTagLink
 extends Atlantis\Tag\EntityLink {
 
@@ -15,40 +13,6 @@ extends Atlantis\Tag\EntityLink {
 	#[Database\Meta\TableJoin('EntityUUID', Extend: TRUE)]
 	public Post
 	$Post;
-
-	////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////
-
-	static public function
-	_JoinExtendTables(Database\Verse $SQL, string $JAlias='Main', ?string $TPre=NULL):
-	void {
-
-		parent::JoinExtendTables($SQL, $JAlias, $TPre);
-
-		$Table = static::GetTableInfo();
-		$TPre = $Table->GetPrefixedAlias($TPre);
-		$JAlias = $Table->GetPrefixedAlias($JAlias);
-
-		Post::JoinMainTables($SQL, $JAlias, 'EntityUUID', $TPre);
-		Post::JoinExtendTables($SQL, $TPre, $TPre);
-
-		return;
-	}
-
-	static public function
-	_JoinExtendFields(Database\Verse $SQL, ?string $TPre=NULL):
-	void {
-
-		parent::JoinExtendFields($SQL, $TPre);
-
-		$Table = static::GetTableInfo();
-		$TPre = $Table->GetPrefixedAlias($TPre);
-
-		Post::JoinMainFields($SQL, $TPre);
-		Post::JoinExtendFields($SQL, $TPre);
-
-		return;
-	}
 
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
