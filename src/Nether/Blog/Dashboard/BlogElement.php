@@ -49,10 +49,12 @@ extends Atlantis\Dashboard\Element {
 		);
 
 		$this->Blogs->Remap(function(Blog\BlogUser $BU) {
+			$Since = new Common\Date('-24 hour');
+
 			return new Blog\Struct\DashboardBlogInfo(
 				$BU,
-				Atlantis\Struct\TrafficRow::FindCount([ 'PathStart'=> "/{$BU->Blog->Alias}" ]),
-				Atlantis\Struct\TrafficRow::FindCount([ 'PathStart'=> "/{$BU->Blog->Alias}", 'Group'=> 'visitor' ])
+				Atlantis\Struct\TrafficRow::FindCount([ 'PathStart'=> "/{$BU->Blog->Alias}", 'Since'=> $Since->GetUnixtime() ]),
+				Atlantis\Struct\TrafficRow::FindCount([ 'PathStart'=> "/{$BU->Blog->Alias}", 'Since'=> $Since->GetUnixtime(), 'Group'=> 'visitor' ])
 			);
 		});
 
