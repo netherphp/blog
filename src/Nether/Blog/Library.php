@@ -56,6 +56,8 @@ implements
 
 		BlogTagLink::Register();
 		PostTagLink::Register();
+		Atlantis\Struct\EntityRelationship::Register('Blog.Entity', Blog::class);
+		Atlantis\Struct\EntityRelationship::Register('Blog.Post', Post::class);
 
 		return;
 	}
