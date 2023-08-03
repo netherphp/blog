@@ -112,7 +112,10 @@ implements
 		if(!$App->User)
 		return;
 
-		$Elements->Push(new Dashboard\BlogElement($App));
+		$Blogs = BlogUser::Find([ 'UserID'=> $App->User->ID, 'Limit'=> 0 ]);
+
+		if(count($Blogs))
+		$Elements->Push(new Dashboard\BlogElement($App, $Blogs));
 
 		return;
 	}

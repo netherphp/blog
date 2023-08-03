@@ -39,7 +39,7 @@ extends Atlantis\Dashboard\Element {
 	void {
 
 		$this->Blogs = Blog\BlogUser::Find([
-			'UserID' => 1,
+			'UserID' => $this->App->User->ID,
 			'Limit'  => 0
 		]);
 
