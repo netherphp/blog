@@ -188,6 +188,13 @@ extends Atlantis\Prototype {
 			=> $Input['Content']
 		};
 
+		if(isset($Input['DateCreated'])) {
+			$Output['TimeCreated'] = Common\Date::FromDateString($Input['DateCreated'])->GetUnixtime();
+
+			if($this->TimeCreated === $this->TimeSorted)
+			$Output['TimeSorted'] = $Output['TimeCreated'];
+		}
+
 		return $Output;
 	}
 
