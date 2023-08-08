@@ -79,7 +79,7 @@ extends Atlantis\Prototype {
 	#[Database\Meta\TypeVarChar(Size: 255)]
 	#[Common\Meta\PropertyListable]
 	#[Common\Meta\PropertyPatchable]
-	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters','TrimmedText'])]
+	#[Common\Meta\PropertyFilter([ Common\Filters\Text::class ,'Trimmed'])]
 	public string
 	$Title;
 
@@ -89,7 +89,7 @@ extends Atlantis\Prototype {
 
 	#[Database\Meta\TypeText]
 	#[Common\Meta\PropertyPatchable]
-	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters','TrimmedText'])]
+	#[Common\Meta\PropertyFilter([ Common\Filters\Text::class ,'Trimmed'])]
 	public string
 	$Content;
 
@@ -100,14 +100,14 @@ extends Atlantis\Prototype {
 	#[Database\Meta\TypeIntTiny(Default: 0, Nullable: FALSE)]
 	#[Common\Meta\PropertyListable]
 	#[Common\Meta\PropertyPatchable]
-	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters','TypeInt'])]
+	#[Common\Meta\PropertyFilter([ Common\Filters\Numbers::class, 'IntType'])]
 	public int
 	$OptAdult;
 
 	#[Database\Meta\TypeIntTiny(Default: 0, Nullable: FALSE)]
 	#[Common\Meta\PropertyListable]
 	#[Common\Meta\PropertyPatchable]
-	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters','TypeInt'])]
+	#[Common\Meta\PropertyFilter([ Common\Filters\Numbers::class, 'IntType'])]
 	public int
 	$OptComments;
 

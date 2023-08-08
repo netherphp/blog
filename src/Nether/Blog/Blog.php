@@ -16,42 +16,42 @@ extends Atlantis\Prototype {
 	#[Database\Meta\TypeChar(Size: 64, Variable: TRUE)]
 	#[Common\Meta\PropertyListable]
 	#[Common\Meta\PropertyPatchable]
-	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters', 'TrimmedText'])]
+	#[Common\Meta\PropertyFilter([ Common\Filters\Text::class , 'Trimmed'])]
 	public string
 	$Alias;
 
 	#[Database\Meta\TypeChar(Size: 64, Variable: TRUE)]
 	#[Common\Meta\PropertyListable]
 	#[Common\Meta\PropertyPatchable]
-	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters', 'TrimmedText'])]
+	#[Common\Meta\PropertyFilter([ Common\Filters\Text::class , 'Trimmed'])]
 	public string
 	$Title;
 
 	#[Database\Meta\TypeChar(Size: 64, Variable: TRUE)]
 	#[Common\Meta\PropertyListable]
 	#[Common\Meta\PropertyPatchable]
-	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters', 'TrimmedText'])]
+	#[Common\Meta\PropertyFilter([ Common\Filters\Text::class , 'Trimmed'])]
 	public ?string
 	$Tagline;
 
 	#[Database\Meta\TypeText]
 	#[Common\Meta\PropertyListable]
 	#[Common\Meta\PropertyPatchable]
-	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters', 'TrimmedText'])]
+	#[Common\Meta\PropertyFilter([ Common\Filters\Text::class , 'Trimmed'])]
 	public ?string
 	$Details;
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: NULL)]
 	#[Database\Meta\ForeignKey('Uploads', 'ID')]
 	#[Common\Meta\PropertyPatchable]
-	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters', 'TypeIntNullable'])]
+	#[Common\Meta\PropertyFilter([ Common\Filters\Numbers::class, 'IntNullable'])]
 	public ?int
 	$ImageHeaderID;
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: NULL)]
 	#[Database\Meta\ForeignKey('Uploads', 'ID')]
 	#[Common\Meta\PropertyPatchable]
-	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters', 'TypeIntNullable'])]
+	#[Common\Meta\PropertyFilter([ Common\Filters\Numbers::class, 'IntNullable'])]
 	public ?int
 	$ImageIconID;
 
@@ -89,7 +89,7 @@ extends Atlantis\Prototype {
 
 	#[Database\Meta\TypeIntTiny(Unsigned: TRUE, Default: 0)]
 	#[Common\Meta\PropertyPatchable]
-	#[Common\Meta\PropertyFilter(['Nether\\Common\\Datafilters', 'TypeInt'])]
+	#[Common\Meta\PropertyFilter([ Common\Filters\Numbers::class, 'IntType' ])]
 	public int
 	$OptAdult;
 

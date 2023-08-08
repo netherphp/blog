@@ -147,11 +147,11 @@ extends Atlantis\ProtectedAPI {
 	void {
 
 		($this->Data)
-		->Editor(Common\Filters\Text::TrimmedText(...))
+		->Editor(Common\Filters\Text::Trimmed(...))
 		->BlogID(Common\Filters\Numbers::IntType(...))
-		->Title(Common\Filters\Text::TrimmedText(...))
-		->Alias(Common\Filters\Text::TrimmedText(...))
-		->Content(Common\Filters\Text::TrimmedText(...))
+		->Title(Common\Filters\Text::Trimmed(...))
+		->Alias(Common\Filters\Text::Trimmed(...))
+		->Content(Common\Filters\Text::Trimmed(...))
 		->CoverImageID(Common\Filters\Numbers::IntNullable(...))
 		->OptUseLinkDate(Common\Filters\Numbers::BoolType(...));
 
