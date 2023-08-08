@@ -18,7 +18,7 @@ extends Atlantis\ProtectedAPI {
 	void {
 
 		($this->Data)
-		->ID(Common\Datafilters::TypeInt(...));
+		->ID(Common\Filters\Numbers::IntType(...));
 
 		////////
 
@@ -44,11 +44,11 @@ extends Atlantis\ProtectedAPI {
 	void {
 
 		($this->Data)
-		->Title(Common\Datafilters::TrimmedText(...))
-		->Alias(Common\Datafilters::TrimmedText(...))
-		->Tagline(Common\Datafilters::StrippedText(...))
-		->Details(Common\Datafilters::TrimmedText(...))
-		->CoverImageID(Common\Datafilters::TypeIntNullable(...));
+		->Title(Common\Filters\Text::Trimmed(...))
+		->Alias(Common\Filters\Text::Trimmed(...))
+		->Tagline(Common\Filters\Text::Stripped(...))
+		->Details(Common\Filters\Text::Trimmed(...))
+		->CoverImageID(Common\Filters\Numbers::IntNullable(...));
 
 		////////
 
@@ -84,7 +84,7 @@ extends Atlantis\ProtectedAPI {
 	void {
 
 		($this->Data)
-		->ID(Common\Datafilters::TypeInt(...));
+		->ID(Common\Filters\Numbers::IntType(...));
 
 		////////
 
@@ -119,7 +119,7 @@ extends Atlantis\ProtectedAPI {
 	void {
 
 		($this->Query)
-		->ID(Common\Datafilters::TypeInt(...));
+		->ID(Common\Filters\Numbers::IntType(...));
 
 		////////
 
@@ -147,12 +147,12 @@ extends Atlantis\ProtectedAPI {
 	void {
 
 		($this->Data)
-		->Editor(Common\Datafilters::TrimmedText(...))
-		->BlogID(Common\Datafilters::TypeInt(...))
-		->Title(Common\Datafilters::TrimmedText(...))
-		->Alias(Common\Datafilters::TrimmedText(...))
-		->Content(Common\Datafilters::TrimmedText(...))
-		->CoverImageID(Common\Datafilters::TypeIntNullable(...))
+		->Editor(Common\Filters\Text::TrimmedText(...))
+		->BlogID(Common\Filters\Numbers::IntType(...))
+		->Title(Common\Filters\Text::TrimmedText(...))
+		->Alias(Common\Filters\Text::TrimmedText(...))
+		->Content(Common\Filters\Text::TrimmedText(...))
+		->CoverImageID(Common\Filters\Numbers::IntNullable(...))
 		->OptUseLinkDate(Common\Filters\Numbers::BoolType(...));
 
 		$Now = Common\Date::CurrentUnixtime();
@@ -287,7 +287,7 @@ extends Atlantis\ProtectedAPI {
 	void {
 
 		($this->Data)
-		->ID(Common\Datafilters::TypeInt(...));
+		->ID(Common\Filters\Numbers::IntType(...));
 
 		////////
 

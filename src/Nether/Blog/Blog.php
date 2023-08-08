@@ -361,7 +361,7 @@ extends Atlantis\Prototype {
 		throw new Exception('blog must have a title');
 
 		if(!$Dataset['Alias'])
-		$Dataset['Alias'] = Common\Datafilters::SlottableKey($Dataset['Title']);
+		$Dataset['Alias'] = Common\Filters\Text::SlottableKey($Dataset['Title']);
 
 		if(!$Dataset['Alias'])
 		throw new Exception('blog must have a valid alias');

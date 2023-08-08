@@ -58,10 +58,10 @@ extends Atlantis\ProtectedWeb {
 	void {
 
 		($this->Data)
-		->ID(Common\Datafilters::TypeIntNullable(...))
+		->ID(Common\Filters\Numbers::IntNullable(...))
 		->Editor([
-			Common\Datafilters::SlottableKey(...),
-			Common\Datafilters::Nullable(...)
+			Common\Filters\Text::SlottableKey(...),
+			Common\Filters\Text::TrimmedNullable(...)
 		]);
 
 		////////
@@ -116,7 +116,7 @@ extends Atlantis\ProtectedWeb {
 	void {
 
 		($this->Data)
-		->ID(Common\Datafilters::TypeIntNullable(...));
+		->ID(Common\Filters\Numbers::IntNullable(...));
 
 		////////
 

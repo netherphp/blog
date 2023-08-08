@@ -28,7 +28,7 @@ extends Atlantis\Prototype {
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE)]
 	#[Database\Meta\ForeignKey('Uploads', 'ID')]
 	#[Common\Meta\PropertyPatchable]
-	#[Common\Meta\PropertyFilter([ Common\Datafilters::class, 'TypeIntNullable' ])]
+	#[Common\Meta\PropertyFilter([ Common\Filters\Numbers::class, 'IntNullable' ])]
 	public ?int
 	$CoverImageID;
 
@@ -47,7 +47,7 @@ extends Atlantis\Prototype {
 
 	#[Database\Meta\TypeIntTiny(Default: 0, Nullable: FALSE)]
 	#[Common\Meta\PropertyPatchable]
-	#[Common\Meta\PropertyFilter([ Common\Datafilters::class, 'TypeInt' ])]
+	#[Common\Meta\PropertyFilter([ Common\Filters\Numbers::class, 'IntType' ])]
 	public int
 	$Enabled;
 
@@ -171,7 +171,7 @@ extends Atlantis\Prototype {
 		$Output = parent::Patch($Input);
 
 		if(array_key_exists('Title', $Output))
-		$Output['Alias'] = Common\Datafilters::SlottableKey($Output['Title']);
+		$Output['Alias'] = Common\Filters\Text::SlottableKey($Output['Title']);
 
 		if(array_key_exists('Content', $Output))
 		$Output['Content'] = match($this->Editor) {

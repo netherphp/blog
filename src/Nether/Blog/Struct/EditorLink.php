@@ -14,31 +14,31 @@ implements Stringable {
 
 	#[Common\Meta\PropertyListable]
 	#[Common\Meta\PropertyPatchable]
-	#[Common\Meta\PropertyFilter([ Common\Datafilters::class, 'TrimmedText' ])]
+	#[Common\Meta\PropertyFilter([ Common\Filters\Text::class, 'Trimmed' ])]
 	public string
 	$Title;
 
 	#[Common\Meta\PropertyListable]
 	#[Common\Meta\PropertyPatchable]
-	#[Common\Meta\PropertyFilter([ Common\Datafilters::class, 'TrimmedText' ])]
+	#[Common\Meta\PropertyFilter([ Common\Filters\Text::class, 'Trimmed' ])]
 	public string
 	$Date;
 
 	#[Common\Meta\PropertyListable]
 	#[Common\Meta\PropertyPatchable]
-	#[Common\Meta\PropertyFilter([ Common\Datafilters::class, 'TrimmedText' ])]
+	#[Common\Meta\PropertyFilter([ Common\Filters\Text::class, 'Trimmed' ])]
 	public string
 	$URL;
 
 	#[Common\Meta\PropertyListable]
 	#[Common\Meta\PropertyPatchable]
-	#[Common\Meta\PropertyFilter([ Common\Datafilters::class, 'TrimmedText' ])]
+	#[Common\Meta\PropertyFilter([ Common\Filters\Text::class, 'Trimmed' ])]
 	public string
 	$Excerpt;
 
 	#[Common\Meta\PropertyListable]
 	#[Common\Meta\PropertyPatchable]
-	#[Common\Meta\PropertyFilter([ Common\Datafilters::class, 'TrimmedText' ])]
+	#[Common\Meta\PropertyFilter([ Common\Filters\Text::class, 'Trimmed' ])]
 	public string
 	$Content;
 
