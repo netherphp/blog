@@ -10,7 +10,7 @@ use Nether\Database;
 class BlogElement
 extends Atlantis\Dashboard\Element {
 
-	public Database\Struct\PrototypeFindResult
+	public Database\ResultSet
 	$Blogs;
 
 	public Common\Datastore

@@ -146,7 +146,7 @@ extends Atlantis\Prototype {
 
 	public function
 	GetRecentPosts(int $Page=1, int $Limit=10, bool $Drafts=FALSE):
-	Database\Struct\PrototypeFindResult {
+	Database\ResultSet {
 
 		return Post::Find([
 			'BlogID'   => $this->ID,
