@@ -459,6 +459,8 @@ extends Atlantis\Prototype {
 		->Define('Sort', 'newest')
 		->Define('Schedule', TRUE);
 
+		$Input['TagID'] ??= NULL;
+
 		return;
 	}
 
