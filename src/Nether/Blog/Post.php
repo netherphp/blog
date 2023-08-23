@@ -15,6 +15,9 @@ use Exception;
 class Post
 extends Atlantis\Prototype {
 
+	use
+	Atlantis\Packages\CoverImage;
+
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE)]
 	#[Database\Meta\ForeignKey('Blogs', 'ID')]
 	public int
@@ -25,12 +28,12 @@ extends Atlantis\Prototype {
 	public int
 	$UserID;
 
-	#[Database\Meta\TypeIntBig(Unsigned: TRUE)]
-	#[Database\Meta\ForeignKey('Uploads', 'ID')]
-	#[Common\Meta\PropertyPatchable]
-	#[Common\Meta\PropertyFilter([ Common\Filters\Numbers::class, 'IntNullable' ])]
-	public ?int
-	$CoverImageID;
+	//#[Database\Meta\TypeIntBig(Unsigned: TRUE)]
+	//#[Database\Meta\ForeignKey('Uploads', 'ID')]
+	//#[Common\Meta\PropertyPatchable]
+	//#[Common\Meta\PropertyFilter([ Common\Filters\Numbers::class, 'IntNullable' ])]
+	//public ?int
+	//$CoverImageID;
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: NULL)]
 	public int
@@ -123,9 +126,9 @@ extends Atlantis\Prototype {
 	public User\Entity
 	$User;
 
-	#[Database\Meta\TableJoin('CoverImageID')]
-	public Atlantis\Media\File
-	$CoverImage;
+	//#[Database\Meta\TableJoin('CoverImageID')]
+	//public Atlantis\Media\File
+	//$CoverImage;
 
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
@@ -307,7 +310,7 @@ extends Atlantis\Prototype {
 	}
 
 	public function
-	GetCoverImageURL(string $Size='md'):
+	_GetCoverImageURL(string $Size='md'):
 	?string {
 
 		$URL = NULL;
