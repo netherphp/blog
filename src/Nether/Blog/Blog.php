@@ -145,8 +145,13 @@ extends Atlantis\Prototype {
 	}
 
 	public function
-	GetRecentPosts(int $Page=1, int $Limit=10, bool $Drafts=FALSE):
+	GetRecentPosts(int $Page=1, int $Limit=10, bool $Drafts=FALSE, bool $SiteTags=TRUE):
 	Database\ResultSet {
+
+		if($SiteTags) {
+			$Tags = Util::FetchSiteTags();
+			Common\Dump::Var($Tags, TRUE);
+		}
 
 		return Post::Find([
 			'BlogID'   => $this->ID,

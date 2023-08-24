@@ -18,16 +18,6 @@ implements
 	Atlantis\Plugins\UploadHandlerInterface,
 	Atlantis\Plugin\LibraryInterface {
 
-	const
-	ConfEnable       = 'Nether.Blog.Enable',
-	ConfBlogsPerUser = 'Nether.Blog.BlogsPerUser',
-	ConfStorageKey   = 'Nether.Blog.StorageKey',
-	ConfBlogURL      = 'Nether.Blog.BlogURL',
-	ConfPostURL      = 'Nether.Blog.PostURL';
-
-	const
-	AccessBlogCreate = 'Nether.Blog.Create';
-
 	use
 	Atlantis\Plugin\LibraryPackage;
 
@@ -313,5 +303,20 @@ implements
 
 		return;
 	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+	// DEPRECATED //////////////////////////////////////////////////
+
+	const
+	ConfEnable       = 'Nether.Blog.Enable',
+	ConfBlogsPerUser = 'Nether.Blog.BlogsPerUser',
+	ConfStorageKey   = 'Nether.Blog.StorageKey',
+	ConfBlogURL      = 'Nether.Blog.BlogURL',
+	ConfPostURL      = 'Nether.Blog.PostURL';
+
+	const
+	AccessBlogCreate = 'Nether.Blog.Create';
 
 }
