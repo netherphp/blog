@@ -150,10 +150,21 @@ extends Atlantis\Prototype {
 
 		if($SiteTags) {
 			$Tags = Util::FetchSiteTags();
-			Common\Dump::Var($Tags, TRUE);
+
+			Common\Dump::Var([
+				'SiteTagsApply' => 'success',
+				'Tags'=> [
+					'ID'    => $Tags[0]->ID,
+					'Alias' => $Tags[0]->Alias,
+					'Name'  => $Tags[0]->Name
+				]
+			], TRUE);
+
+			$Tags->Remap(fn(Atlantis\Tag\Entity $T)=> $T->ID);
 		}
 
 		return Post::Find([
+			'TagID'    => $Tags->Count() ? $Tags : NULL,
 			'BlogID'   => $this->ID,
 			'Enabled'  => $Drafts ? 0 : 1,
 			'Schedule' => $Drafts ? NULL : TRUE,

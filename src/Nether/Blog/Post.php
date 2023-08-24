@@ -16,7 +16,11 @@ class Post
 extends Atlantis\Prototype {
 
 	use
-	Atlantis\Packages\CoverImage;
+	Atlantis\Packages\CoverImage {
+		HasCoverImage        as HasPostImage;
+		GetCoverImageURL     as GetPostImageURL;
+		GetCoverImageSizeURL as GetPostImageSizeURL;
+	}
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE)]
 	#[Database\Meta\ForeignKey('Blogs', 'ID')]
@@ -27,13 +31,6 @@ extends Atlantis\Prototype {
 	#[Database\Meta\ForeignKey('Users', 'ID')]
 	public int
 	$UserID;
-
-	//#[Database\Meta\TypeIntBig(Unsigned: TRUE)]
-	//#[Database\Meta\ForeignKey('Uploads', 'ID')]
-	//#[Common\Meta\PropertyPatchable]
-	//#[Common\Meta\PropertyFilter([ Common\Filters\Numbers::class, 'IntNullable' ])]
-	//public ?int
-	//$CoverImageID;
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: NULL)]
 	public int
@@ -125,10 +122,6 @@ extends Atlantis\Prototype {
 	#[Database\Meta\TableJoin('UserID', Extend: TRUE)]
 	public User\Entity
 	$User;
-
-	//#[Database\Meta\TableJoin('CoverImageID')]
-	//public Atlantis\Media\File
-	//$CoverImage;
 
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
@@ -310,22 +303,14 @@ extends Atlantis\Prototype {
 	}
 
 	public function
-	_GetCoverImageURL(string $Size='md'):
+	GetCoverImageURL(string $Size='md'):
 	?string {
 
-		$URL = NULL;
+		if(isset($this->CoverImage))
+		return $this->GetPostImageURL($Size);
 
-		if(isset($this->CoverImage)) {
-			$URL = $this->CoverImage->GetPublicURL();
-			$URL = str_replace('original.', "{$Size}.", $URL);
-			return $URL;
-		}
-
-		if(isset($this->Blog->ImageHeader)) {
-			$URL = $this->Blog->ImageHeader->GetPublicURL();
-			$URL = str_replace('original.', "{$Size}.", $URL);
-			return $URL;
-		}
+		if(isset($this->Blog->ImageHeader))
+		return $this->Blog->GetHeaderURL($Size);
 
 		return NULL;
 	}
@@ -409,46 +394,6 @@ extends Atlantis\Prototype {
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
 
-	#[Common\Meta\Deprecated('2023-07-19', 'TableJoin attribute replaced this')]
-	static public function
-	_JoinExtendTables(Database\Verse $SQL, string $JAlias='Main', ?string $TPre=NULL):
-	void {
-
-		$Table = static::GetTableInfo();
-		$TPre = $Table->GetPrefixedAlias($TPre);
-		$JAlias = $Table->GetPrefixedAlias($JAlias);
-
-		Blog::JoinMainTables($SQL, $JAlias, 'BlogID', $TPre);
-		Blog::JoinExtendTables($SQL, $TPre, $TPre);
-
-		User\Entity::JoinMainTables($SQL, $JAlias, 'UserID', $TPre);
-		User\Entity::JoinExtendTables($SQL, $TPre, $TPre);
-
-		Atlantis\Media\File::JoinMainTables($SQL, $JAlias, 'CoverImageID', $TPre);
-
-
-		return;
-	}
-
-	#[Common\Meta\Deprecated('2023-07-19', 'TableJoin attribute replaced this')]
-	static public function
-	_JoinExtendFields(Database\Verse $SQL, ?string $TPre=NULL):
-	void {
-
-		$Table = static::GetTableInfo();
-		$TPre = $Table->GetPrefixedAlias($TPre);
-
-		Blog::JoinMainFields($SQL, $TPre);
-		Blog::JoinExtendFields($SQL, $TPre);
-
-		User\Entity::JoinMainFields($SQL, $TPre);
-		User\Entity::JoinExtendFields($SQL, $TPre);
-
-		Atlantis\Media\File::JoinMainFields($SQL, $TPre);
-
-		return;
-	}
-
 	static protected function
 	FindExtendOptions(Common\Datastore $Input):
 	void {
@@ -482,6 +427,50 @@ extends Atlantis\Prototype {
 				$Input[':TimeSortedSchedule'] = Common\Date::CurrentUnixtime();
 			}
 		}
+
+		static::FindExtendFilters_ByTagID($SQL, $Input);
+
+		return;
+	}
+
+	static protected function
+	FindExtendFilters_ByTagID(Database\Verse $SQL, Common\Datastore $Input):
+	void {
+
+		// @todo 2023-08-24 bob
+		// this code is technically functioning as an OR at the moment and
+		// im certain it should be an AND before progressing building
+		// against this too mcuh.
+
+		$TagID = NULL;
+		$TableLink = NULL;
+
+		////////
+
+		if(!is_iterable($Input['TagID']))
+		return;
+
+		////////
+
+		$TableLink = PostTagLink::GetTableInfo();
+
+		$SQL->Join(sprintf(
+			'%s TQ1 ON Main.UUID=TQ1.EntityUUID',
+			$TableLink->Name
+		));
+
+		$SQL->Where(sprintf(
+			'TQ1.TagID IN (:TagID)'
+		));
+
+		$SQL->Group('Main.ID');
+
+		// @todo 2023-08-24 bob
+		// cant you update Database to be able to consume datastores
+		// already man like you're literally just punching yourself here.
+
+		if($Input['TagID'] instanceof Common\Datastore)
+		$Input['TagID'] = $Input['TagID']->GetData();
 
 		return;
 	}
