@@ -158,6 +158,9 @@ extends Atlantis\ProtectedAPI {
 		$Now = Common\Date::CurrentUnixtime();
 		$TimeSorted = $Now;
 
+		$SiteTags = Blog\Util::FetchSiteTags();
+		$Tag = NULL;
+
 		////////
 
 		if(!$this->Data->BlogID)
@@ -208,6 +211,12 @@ extends Atlantis\ProtectedAPI {
 				'CoverImageID' => $this->Data->CoverImageID,
 				'Content'      => $Content
 			]);
+
+			if($SiteTags->Count())
+			foreach($SiteTags as $Tag) {
+				Blog\PostTagLink::InsertByPair($Tag->ID, $Post->UUID);
+			}
+
 		}
 
 		catch(Blog\Error\PostMissingData $Err) {
