@@ -53,8 +53,17 @@ extends Atlantis\Dashboard\Element {
 
 			return new Blog\Struct\DashboardBlogInfo(
 				$BU,
-				Atlantis\Struct\TrafficRow::FindCount([ 'PathStart'=> "/{$BU->Blog->Alias}", 'Since'=> $Since->GetUnixtime() ]),
-				Atlantis\Struct\TrafficRow::FindCount([ 'PathStart'=> "/{$BU->Blog->Alias}", 'Since'=> $Since->GetUnixtime(), 'Group'=> 'visitor' ])
+				Atlantis\Struct\TrafficRow::FindCount([
+					'PathStart' => "/{$BU->Blog->Alias}",
+					'Since'     => $Since->GetUnixtime(),
+					'Domain'    => Atlantis\Library::Get(Atlantis\Key::ConfProjectDomain)
+				]),
+				Atlantis\Struct\TrafficRow::FindCount([
+					'PathStart' => "/{$BU->Blog->Alias}",
+					'Since'     => $Since->GetUnixtime(),
+					'Group'     => 'visitor',
+					'Domain'    => Atlantis\Library::Get(Atlantis\Key::ConfProjectDomain)
+				])
 			);
 		});
 
