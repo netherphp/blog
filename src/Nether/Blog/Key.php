@@ -15,4 +15,8 @@ class Key {
 	const
 	AccessBlogCreate = 'Nether.Blog.Create';
 
+	const
+	EntityTypeBlog = 'Blog.Entity',
+	EntityTypePost = 'Blog.Post';
+
 };

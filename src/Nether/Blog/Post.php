@@ -394,6 +394,94 @@ extends Atlantis\Prototype {
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
 
+	#[Common\Meta\Date('2023-09-15')]
+	public function
+	FetchRelationships(string $ChildType):
+	Database\ResultSet {
+
+		$Index = Atlantis\Struct\EntityRelationship::Find([
+			'ParentType' => Key::EntityTypePost,
+			'ParentUUID' => $this->UUID,
+
+			'ChildType'  => $ChildType,
+			'Remappers'  => fn(Atlantis\Struct\EntityRelationship $P)=> $P->ChildUUID
+		]);
+
+		if(!$Index->Count())
+		$Index->Push('null-null-null');
+
+		////////
+
+		$ChildClass = Atlantis\Struct\EntityRelationship::TypeClass($ChildType);
+
+		$Result = ($ChildClass)::Find([
+			'UUID'    => $Index->GetData(),
+			'Sort'    => 'newest',
+			'Limit'   => 0
+		]);
+
+		////////
+
+		return $Result;
+	}
+
+	#[Common\Meta\Date('2023-07-28')]
+	public function
+	FetchPhotos():
+	Common\Datastore {
+
+		return $this->FetchRelationships('Media.Image');
+
+		$Index = Atlantis\Struct\EntityRelationship::Find([
+			'ParentType' => 'Profile.Entity',
+			'ParentUUID' => $this->UUID,
+
+			'ChildType'  => 'Media.Image',
+			'Remappers'  => fn(Atlantis\Struct\EntityRelationship $P)=> $P->ChildUUID
+		]);
+
+		if(!$Index->Count())
+		$Index->Push('null-null-null');
+
+		$Result = Atlantis\Media\File::Find([
+			'UUID'    => $Index->GetData(),
+			'Sort'    => 'newest',
+			'Limit'   => 0
+		]);
+
+		return $Result;
+	}
+
+	#[Common\Meta\Date('2023-07-28')]
+	public function
+	FetchVideos():
+	Common\Datastore {
+
+		return $this->FetchRelationships('Media.Video.ThirdParty');
+
+		$Index = Atlantis\Struct\EntityRelationship::Find([
+			'ParentType' => 'Profile.Entity',
+			'ParentUUID' => $this->UUID,
+
+			'ChildType'  => 'Media.Video.ThirdParty',
+			'Remappers'  => fn(Atlantis\Struct\EntityRelationship $P)=> $P->ChildUUID
+		]);
+
+		if(!$Index->Count())
+		$Index->Push('null-null-null');
+
+		$Result = Atlantis\Media\VideoThirdParty::Find([
+			'UUID'    => $Index->GetData(),
+			'Sort'    => 'newest',
+			'Limit'   => 0
+		]);
+
+		return $Result;
+	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
 	static protected function
 	FindExtendOptions(Common\Datastore $Input):
 	void {

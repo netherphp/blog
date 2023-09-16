@@ -100,9 +100,18 @@ extends Atlantis\PublicWeb {
 	void {
 
 		$BlogUser = NULL;
+		$PostPhotos = NULL;
+		$PostVideos = NULL;
+
+		////////
 
 		if($this->User)
 		$BlogUser = $Post->Blog->GetUser($this->User->ID);
+
+		$PostPhotos = $Post->FetchPhotos();
+		$PostVideos = $Post->FetchVideos();
+
+		////////
 
 		($this->Surface)
 		->Set('Page.ImageURL', new Atlantis\WebURL($Post->GetCoverImageURL('lg') ?? ''))
@@ -114,6 +123,8 @@ extends Atlantis\PublicWeb {
 		->Area('blog/view', [
 			'Blog'     => $Post->Blog,
 			'Post'     => $Post,
+			'Photos'   => $PostPhotos,
+			'Videos'   => $PostVideos,
 			'BlogUser' => $BlogUser
 		]);
 
