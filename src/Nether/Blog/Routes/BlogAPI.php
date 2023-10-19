@@ -153,8 +153,14 @@ extends Atlantis\ProtectedAPI {
 		->Alias(Common\Filters\Text::Trimmed(...))
 		->Content(Common\Filters\Text::Trimmed(...))
 		->CoverImageID(Common\Filters\Numbers::IntNullable(...))
-		->OptUseLinkDate(Common\Filters\Numbers::BoolType(...));
+		->Enabled(Common\Filters\Numbers::IntType(...))
+		->OptUseLinkDate(Common\Filters\Numbers::BoolType(...))
+		->Plugins([
+			Common\Filters\Text::Base64Decode(...),
+			Common\Filters\Text::DatastoreFromJSON(...)
+		]);
 
+		$Plugins = $this->Data->Plugins;
 		$Now = Common\Date::CurrentUnixtime();
 		$TimeSorted = $Now;
 
@@ -209,7 +215,8 @@ extends Atlantis\ProtectedAPI {
 				'Title'        => $this->Data->Title,
 				'Alias'        => $this->Data->Alias,
 				'CoverImageID' => $this->Data->CoverImageID,
-				'Content'      => $Content
+				'Content'      => $Content,
+				'Enabled'      => $this->Data->Enabled
 			]);
 
 			if($SiteTags->Count())
@@ -217,6 +224,11 @@ extends Atlantis\ProtectedAPI {
 				Blog\PostTagLink::InsertByPair($Tag->ID, $Post->UUID);
 			}
 
+			if($Plugins['Create'])
+			$this->HandlePluginsBlogPostEntityCreate($Plugins['Create'], $Post);
+
+			if($Plugins['Save'])
+			$this->HandlePluginsBlogPostEntitySave($Plugins['Save'], $Post);
 		}
 
 		catch(Blog\Error\PostMissingData $Err) {
@@ -240,7 +252,11 @@ extends Atlantis\ProtectedAPI {
 
 		($this->Data)
 		->ID(Common\Filters\Numbers::IntType(...))
-		->OptUseLinkDate(Common\Filters\Numbers::BoolType(...));
+		->OptUseLinkDate(Common\Filters\Numbers::BoolType(...))
+		->Plugins([
+			Common\Filters\Text::Base64Decode(...),
+			Common\Filters\Text::DatastoreFromJSON(...)
+		]);
 
 		////////
 
@@ -248,6 +264,7 @@ extends Atlantis\ProtectedAPI {
 		$this->Quit(1, 'no ID specified');
 
 		$Post = Blog\Post::GetByID($this->Data->ID);
+		$Plugins = $this->Data->Plugins;
 
 		if(!$Post)
 		$this->Quit(2, 'post not found');
@@ -284,6 +301,13 @@ extends Atlantis\ProtectedAPI {
 		}
 
 		$Post->Update($Patchset);
+
+		if($Plugins['Update'])
+		$this->HandlePluginsBlogPostEntityUpdate($Plugins['Update'], $Post);
+
+		if($Plugins['Save'])
+		$this->HandlePluginsBlogPostEntitySave($Plugins['Save'], $Post);
+
 		$this->SetGoto($Post->GetURL());
 
 		return;
@@ -327,6 +351,52 @@ extends Atlantis\ProtectedAPI {
 		$Post->Drop();
 
 		$this->SetGoto($Goto);
+		return;
+	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
+	#[Common\Meta\Info('Called when a new post is first created.')]
+	protected function
+	HandlePluginsBlogPostEntityCreate(array $Plugins, Blog\Post $Post):
+	void {
+
+		return;
+	}
+
+	#[Common\Meta\Info('Called when a post is updated.')]
+	protected function
+	HandlePluginsBlogPostEntityUpdate(array $Plugins, Blog\Post $Post):
+	void {
+
+		return;
+	}
+
+	#[Common\Meta\Info('Called after a post has been created or updated.')]
+	protected function
+	HandlePluginsBlogPostEntitySave(array $Plugins, Blog\Post $Post):
+	void {
+
+		Common\Datastore::FromArray($Plugins)
+		->Each(function(mixed $Data, mixed $Class) use($Post) {
+
+			($this->App->Plugins)
+			->Get(Blog\Plugins\BlogPostEntitySaveInterface::class)
+			->Filter(fn(string $C)=> $C === $Class)
+			->Map(fn(string $C)=> new $C)
+			->Each(
+				fn(Blog\Plugins\BlogPostEntitySaveInterface $Plugin)
+				=> $Plugin->OnSave(
+					$this->App,
+					Common\Datastore::FromArray($Data ?: []),
+					$Post
+				)
+			);
+
+			return;
+		});
+
 		return;
 	}
 

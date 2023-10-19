@@ -62,7 +62,23 @@ extends Atlantis\ProtectedWeb {
 		->Editor([
 			Common\Filters\Text::SlottableKey(...),
 			Common\Filters\Text::TrimmedNullable(...)
+		])
+		->Plugins([
+			Common\Filters\Text::Base64Decode(...),
+			Common\Filters\Text::DatastoreFromJSON(...)
 		]);
+
+		////////
+
+		$Plugins = $this->Data->Plugins;
+		$Values = new Common\Datastore;
+
+		//Common\Dump::Var($Plugins, TRUE);
+
+		if($Plugins['Values'])
+		$Values->MergeRight($this->GetValuesFromPlugins(
+			$Plugins['Values']
+		));
 
 		////////
 
@@ -74,9 +90,10 @@ extends Atlantis\ProtectedWeb {
 
 		($this->Surface)
 		->Wrap('blog/dashboard/blog-write', [
-			'Post'    => NULL,
-			'Editor'  => $this->Data->Editor,
-			'Blogs'   => $Blogs
+			'Post'        => NULL,
+			'Values'      => $Values,
+			'Editor'      => $this->Data->Editor,
+			'Blogs'       => $Blogs
 		]);
 
 		return;
@@ -116,7 +133,15 @@ extends Atlantis\ProtectedWeb {
 	void {
 
 		($this->Data)
-		->ID(Common\Filters\Numbers::IntNullable(...));
+		->ID(Common\Filters\Numbers::IntNullable(...))
+		->Plugins([
+			Common\Filters\Text::Base64Decode(...),
+			Common\Filters\Text::DatastoreFromJSON(...)
+		]);
+
+		////////
+
+		$Values = new Common\Datastore;
 
 		////////
 
@@ -129,6 +154,7 @@ extends Atlantis\ProtectedWeb {
 		($this->Surface)
 		->Wrap('blog/dashboard/blog-write', [
 			'Post'   => $Post,
+			'Values' => $Values,
 			'Blogs'  => $Blogs,
 			'Editor' => $Post->Editor
 		]);
@@ -220,5 +246,40 @@ extends Atlantis\ProtectedWeb {
 		return Avenue\Response::CodeOK;
 	}
 
+	////////////////////////////////////////////////////////////////
+	// PLUGIN HELPERS //////////////////////////////////////////////
+
+	#[Common\Meta\Info('Given Key-Value list of Plugin => Data.')]
+	protected function
+	GetValuesFromPlugins(iterable $Plugins):
+	Common\Datastore {
+
+		$Output = new Common\Datastore;
+
+		////////
+
+		Common\Datastore::FromArray($Plugins)
+		->Each(function(mixed $VData, mixed $Class) use($Output) {
+
+			($this->App->Plugins)
+			->Get(Blog\Plugins\BlogPostEditorValuesInterface::class)
+			->Filter(fn(string $C)=> $C === $Class)
+			->Map(fn(string $C)=> new $C)
+			->Each(
+				fn(Blog\Plugins\BlogPostEditorValuesInterface $Plugin)
+				=> $Output->MergeRight($Plugin->GetValues(
+					$this->App,
+					Common\Datastore::FromArray($VData ?: []),
+					NULL
+				))
+			);
+
+			return;
+		});
+
+		////////
+
+		return $Output;
+	}
 
 }
