@@ -219,10 +219,22 @@ extends Atlantis\ProtectedAPI {
 				'Enabled'      => $this->Data->Enabled
 			]);
 
+			// take note of any plugins that were used in the creation
+			// of this post.
+
+			if($Plugins->Count())
+			$Post->Update($Post->Patch([
+				'ExtraData' => [ 'Plugins' => $Plugins ]
+			]));
+
+			// associate the default site tags with the posts.
+
 			if($SiteTags->Count())
 			foreach($SiteTags as $Tag) {
 				Blog\PostTagLink::InsertByPair($Tag->ID, $Post->UUID);
 			}
+
+			// run the plugin apis.
 
 			if($Plugins['Create'])
 			$this->HandlePluginsBlogPostEntityCreate($Plugins['Create'], $Post);
@@ -264,7 +276,7 @@ extends Atlantis\ProtectedAPI {
 		$this->Quit(1, 'no ID specified');
 
 		$Post = Blog\Post::GetByID($this->Data->ID);
-		$Plugins = $this->Data->Plugins;
+		$Plugins = new Common\Datastore;
 
 		if(!$Post)
 		$this->Quit(2, 'post not found');
@@ -282,7 +294,12 @@ extends Atlantis\ProtectedAPI {
 		if(!$Post->CanUserEdit($BlogUser))
 		$this->Quit(3, 'user does not have blog edit access');
 
-		////////
+		// make note of the plugins we used when creating the post.
+
+		if($Post->ExtraData['Plugins'])
+		$Plugins->MergeRight($Post->ExtraData['Plugins']);
+
+		// generate the patch set for updating the post.
 
 		$Patchset = $Post->Patch($this->Data);
 
@@ -302,14 +319,17 @@ extends Atlantis\ProtectedAPI {
 
 		$Post->Update($Patchset);
 
+		////////
+
 		if($Plugins['Update'])
-		$this->HandlePluginsBlogPostEntityUpdate($Plugins['Update'], $Post);
+		$this->HandlePluginsBlogPostEntityUpdate((array)$Plugins['Update'], $Post);
 
 		if($Plugins['Save'])
-		$this->HandlePluginsBlogPostEntitySave($Plugins['Save'], $Post);
+		$this->HandlePluginsBlogPostEntitySave((array)$Plugins['Save'], $Post);
+
+		////////
 
 		$this->SetGoto($Post->GetURL());
-
 		return;
 	}
 
@@ -378,24 +398,23 @@ extends Atlantis\ProtectedAPI {
 	HandlePluginsBlogPostEntitySave(array $Plugins, Blog\Post $Post):
 	void {
 
-		Common\Datastore::FromArray($Plugins)
-		->Each(function(mixed $Data, mixed $Class) use($Post) {
+		$Class = NULL;
+		$Data = NULL;
 
-			($this->App->Plugins)
-			->Get(Blog\Plugins\BlogPostEntitySaveInterface::class)
-			->Filter(fn(string $C)=> $C === $Class)
-			->Map(fn(string $C)=> new $C)
-			->Each(
-				fn(Blog\Plugins\BlogPostEntitySaveInterface $Plugin)
-				=> $Plugin->OnSave(
-					$this->App,
-					Common\Datastore::FromArray($Data ?: []),
-					$Post
-				)
-			);
+		foreach($Plugins as $Class => $Data)
+		($this->App->Plugins)
+		->Get(Blog\Plugins\BlogPostEntitySaveInterface::class)
+		->Filter(fn(string $C)=> $C === $Class)
+		->Map(fn(string $C)=> new $C)
+		->Each(
+			fn(Blog\Plugins\BlogPostEntitySaveInterface $Plugin)
+			=> $Plugin->OnSave(
+				$this->App,
+				Common\Datastore::FromArray($Data ?: []),
+				$Post
+			)
+		);
 
-			return;
-		});
 
 		return;
 	}

@@ -13,7 +13,9 @@ use Exception;
 
 #[Database\Meta\TableClass('BlogPosts', 'BP')]
 class Post
-extends Atlantis\Prototype {
+extends Atlantis\Prototype
+implements
+	Atlantis\Packages\ExtraDataInterface {
 
 	use
 	Atlantis\Packages\CoverImage {
@@ -110,6 +112,9 @@ extends Atlantis\Prototype {
 	#[Common\Meta\PropertyFilter([ Common\Filters\Numbers::class, 'IntType'])]
 	public int
 	$OptComments;
+
+	use
+	Atlantis\Packages\ExtraData;
 
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
