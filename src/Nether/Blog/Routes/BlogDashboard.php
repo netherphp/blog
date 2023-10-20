@@ -59,26 +59,31 @@ extends Atlantis\ProtectedWeb {
 
 		($this->Data)
 		->ID(Common\Filters\Numbers::IntNullable(...))
+		->Plugins(Common\Filters\Text::TrimmedNullable(...))
 		->Editor([
 			Common\Filters\Text::SlottableKey(...),
 			Common\Filters\Text::TrimmedNullable(...)
-		])
-		->Plugins([
-			Common\Filters\Text::Base64Decode(...),
-			Common\Filters\Text::DatastoreFromJSON(...)
 		]);
 
 		////////
 
-		$Plugins = $this->Data->Plugins;
+		$PluginData = $this->Data->Plugins;
+		$Plugins = Blog\Struct\BlogPostPluginData::FromEncoded($PluginData);
 		$Values = new Common\Datastore;
 
-		//Common\Dump::Var($Plugins, TRUE);
+		$SiteTagConf = $this->App->Config[Atlantis\Key::ConfSiteTags] ?: [];
+		$SiteTags = (
+			Atlantis\Util::FetchSiteTagsAll()
+			->Remap(function(Atlantis\Tag\Entity $Tag) use($SiteTagConf) {
+				return (object)[
+					'Tag'      => $Tag,
+					'Selected' => in_array($Tag->Alias, $SiteTagConf)
+				];
+			})
+		);
 
-		if($Plugins['Values'])
-		$Values->MergeRight($this->GetValuesFromPlugins(
-			$Plugins['Values']
-		));
+		if($Plugins->Values->Count())
+		$Values->MergeRight($Plugins->GetValues($this->App));
 
 		////////
 
@@ -93,7 +98,9 @@ extends Atlantis\ProtectedWeb {
 			'Post'        => NULL,
 			'Values'      => $Values,
 			'Editor'      => $this->Data->Editor,
-			'Blogs'       => $Blogs
+			'Blogs'       => $Blogs,
+			'SiteTags'    => $SiteTags,
+			'PluginData'  => $PluginData
 		]);
 
 		return;
@@ -134,14 +141,24 @@ extends Atlantis\ProtectedWeb {
 
 		($this->Data)
 		->ID(Common\Filters\Numbers::IntNullable(...))
-		->Plugins([
-			Common\Filters\Text::Base64Decode(...),
-			Common\Filters\Text::DatastoreFromJSON(...)
-		]);
+		->Plugins(Common\Filters\Text::TrimmedNullable(...));
 
 		////////
 
+		$PluginData = $this->Data->Plugins;
+		$Plugins = Blog\Struct\BlogPostPluginData::FromEncoded($PluginData);
 		$Values = new Common\Datastore;
+
+		$PostTags = $Post->GetTagsIndexedByID();
+		$SiteTags = (
+			Atlantis\Util::FetchSiteTagsAll()
+			->Remap(function(Atlantis\Tag\Entity $Tag) use($PostTags) {
+				return (object)[
+					'Tag'      => $Tag,
+					'Selected' => isset($PostTags[$Tag->ID])
+				];
+			})
+		);
 
 		////////
 
@@ -151,12 +168,16 @@ extends Atlantis\ProtectedWeb {
 			'Remappers' => [ fn(Blog\BlogUser $BU)=> $BU->Blog ]
 		]);
 
+		////////
+
 		($this->Surface)
 		->Wrap('blog/dashboard/blog-write', [
-			'Post'   => $Post,
-			'Values' => $Values,
-			'Blogs'  => $Blogs,
-			'Editor' => $Post->Editor
+			'Post'       => $Post,
+			'Values'     => $Values,
+			'Blogs'      => $Blogs,
+			'Editor'     => $Post->Editor,
+			'SiteTags'   => $SiteTags,
+			'PluginData' => $PluginData
 		]);
 
 		return;
@@ -244,42 +265,6 @@ extends Atlantis\ProtectedWeb {
 		$ExtraData['Blog'] = $Blog;
 
 		return Avenue\Response::CodeOK;
-	}
-
-	////////////////////////////////////////////////////////////////
-	// PLUGIN HELPERS //////////////////////////////////////////////
-
-	#[Common\Meta\Info('Given Key-Value list of Plugin => Data.')]
-	protected function
-	GetValuesFromPlugins(iterable $Plugins):
-	Common\Datastore {
-
-		$Output = new Common\Datastore;
-
-		////////
-
-		Common\Datastore::FromArray($Plugins)
-		->Each(function(mixed $VData, mixed $Class) use($Output) {
-
-			($this->App->Plugins)
-			->Get(Blog\Plugins\BlogPostEditorValuesInterface::class)
-			->Filter(fn(string $C)=> $C === $Class)
-			->Map(fn(string $C)=> new $C)
-			->Each(
-				fn(Blog\Plugins\BlogPostEditorValuesInterface $Plugin)
-				=> $Output->MergeRight($Plugin->GetValues(
-					$this->App,
-					Common\Datastore::FromArray($VData ?: []),
-					NULL
-				))
-			);
-
-			return;
-		});
-
-		////////
-
-		return $Output;
 	}
 
 }

@@ -155,17 +155,26 @@ extends Atlantis\ProtectedAPI {
 		->CoverImageID(Common\Filters\Numbers::IntNullable(...))
 		->Enabled(Common\Filters\Numbers::IntType(...))
 		->OptUseLinkDate(Common\Filters\Numbers::BoolType(...))
-		->Plugins([
-			Common\Filters\Text::Base64Decode(...),
-			Common\Filters\Text::DatastoreFromJSON(...)
-		]);
+		->Plugins(Common\Filters\Text::TrimmedNullable(...))
+		->SiteTags(
+			Common\Filters\Lists::ArrayOf(...),
+			Common\Filters\Numbers::IntType(...)
+		);
 
-		$Plugins = $this->Data->Plugins;
+		$PluginData = $this->Data->Plugins;
+		$Plugins = Blog\Struct\BlogPostPluginData::FromEncoded($PluginData);
 		$Now = Common\Date::CurrentUnixtime();
 		$TimeSorted = $Now;
 
-		$SiteTags = Blog\Util::FetchSiteTags();
+		$SiteTagConf = $this->App->Config[Atlantis\Key::ConfSiteTags] ?: [];
+		$SiteTags = NULL;
 		$Tag = NULL;
+
+		if(count($this->Data->SiteTags))
+		$SiteTags = Atlantis\Tag\Entity::Find([
+			'ID'   => $this->Data->SiteTags,
+			'Type' => 'site'
+		]);
 
 		////////
 
@@ -224,23 +233,26 @@ extends Atlantis\ProtectedAPI {
 
 			if($Plugins->Count())
 			$Post->Update($Post->Patch([
-				'ExtraData' => [ 'Plugins' => $Plugins ]
+				'ExtraData' => [ 'Plugins' => $Plugins->ToArray() ]
 			]));
 
 			// associate the default site tags with the posts.
 
-			if($SiteTags->Count())
+			if(count($SiteTagConf) && !$SiteTags->Count())
+			$this->Quit(5, 'No site tags have been selected.');
+
+			if($SiteTags && $SiteTags->Count())
 			foreach($SiteTags as $Tag) {
 				Blog\PostTagLink::InsertByPair($Tag->ID, $Post->UUID);
 			}
 
 			// run the plugin apis.
 
-			if($Plugins['Create'])
-			$this->HandlePluginsBlogPostEntityCreate($Plugins['Create'], $Post);
+			if($Plugins->Create->Count())
+			$this->HandlePluginsBlogPostEntityCreate($Plugins->Create, $Post);
 
-			if($Plugins['Save'])
-			$this->HandlePluginsBlogPostEntitySave($Plugins['Save'], $Post);
+			if($Plugins->Save->Count())
+			$this->HandlePluginsBlogPostEntitySave($Plugins->Save, $Post);
 		}
 
 		catch(Blog\Error\PostMissingData $Err) {
@@ -262,21 +274,28 @@ extends Atlantis\ProtectedAPI {
 	BlogPostPatch():
 	void {
 
+		// 1 no id
+		// 2 not found
+		// 3 permission denied
+		// 4 no site tags selected
+
 		($this->Data)
 		->ID(Common\Filters\Numbers::IntType(...))
 		->OptUseLinkDate(Common\Filters\Numbers::BoolType(...))
-		->Plugins([
-			Common\Filters\Text::Base64Decode(...),
-			Common\Filters\Text::DatastoreFromJSON(...)
-		]);
+		->Plugins(Common\Filters\Text::TrimmedNullable(...))
+		->SiteTags(
+			Common\Filters\Lists::ArrayOf(...),
+			Common\Filters\Numbers::IntType(...)
+		);
 
 		////////
 
 		if(!$this->Data->ID)
 		$this->Quit(1, 'no ID specified');
 
+		////////
+
 		$Post = Blog\Post::GetByID($this->Data->ID);
-		$Plugins = new Common\Datastore;
 
 		if(!$Post)
 		$this->Quit(2, 'post not found');
@@ -294,12 +313,17 @@ extends Atlantis\ProtectedAPI {
 		if(!$Post->CanUserEdit($BlogUser))
 		$this->Quit(3, 'user does not have blog edit access');
 
-		// make note of the plugins we used when creating the post.
+		////////
 
-		if($Post->ExtraData['Plugins'])
-		$Plugins->MergeRight($Post->ExtraData['Plugins']);
+		$Plugins = new Blog\Struct\BlogPostPluginData(match(TRUE) {
+			isset($Post->ExtraData['Plugins'])
+			=> (array)$Post->ExtraData['Plugins'],
 
-		// generate the patch set for updating the post.
+			default
+			=> []
+		});
+
+		////////
 
 		$Patchset = $Post->Patch($this->Data);
 
@@ -319,13 +343,58 @@ extends Atlantis\ProtectedAPI {
 
 		$Post->Update($Patchset);
 
-		////////
+		////////////////
+		////////////////
 
-		if($Plugins['Update'])
-		$this->HandlePluginsBlogPostEntityUpdate((array)$Plugins['Update'], $Post);
+		$SiteTags = new Common\Datastore;
+		$SiteTagsConf = $this->App->Config[Atlantis\Key::ConfSiteTags] ?: [];
+		$SiteTagsCurr = $Post->GetTagsIndexedByID()->Filter(
+			fn(Atlantis\Tag\Entity $T)
+			=> $T->Type === 'site'
+		);
 
-		if($Plugins['Save'])
-		$this->HandlePluginsBlogPostEntitySave((array)$Plugins['Save'], $Post);
+		// find the tags that were asked for to confirm they exist before
+		// adding them.
+
+		if(count($this->Data->SiteTags))
+		$SiteTags->MergeRight(Atlantis\Tag\Entity::Find([
+			'Type' => 'site',
+			'ID'   => $this->Data->SiteTags
+		]));
+
+		// complain if this framework is configured to use site tags but
+		// this post has none.
+
+		if(count($SiteTagsConf) && !$SiteTags->Count())
+		$this->Quit(4, 'No site tags have been selected.');
+
+		// add the tags that do not exist and de-index the ones that do so
+		// we can strip off any now unused tags.
+
+		$SiteTags->Each(function(Atlantis\Tag\Entity $Tag) use($Post, &$SiteTagsCurr) {
+			if(!isset($SiteTagsCurr[$Tag->ID])) {
+				Blog\BlogTagLink::InsertByPair($Tag->ID, $Post->UUID);
+				return;
+			}
+
+			unset($SiteTagsCurr[$Tag->ID]);
+			return;
+		});
+
+		Common\Datastore::FromArray($SiteTagsCurr)
+		->Each(function(Atlantis\Tag\Entity $Tag) use($Post) {
+			Atlantis\Tag\EntityLink::DeleteByPair($Tag->ID, $Post->UUID);
+			return;
+		});
+
+		////////////////
+		////////////////
+
+		if($Plugins->Update)
+		$this->HandlePluginsBlogPostEntityUpdate($Plugins->Update, $Post);
+
+		if($Plugins->Save)
+		$this->HandlePluginsBlogPostEntitySave($Plugins->Save, $Post);
 
 		////////
 
@@ -379,7 +448,7 @@ extends Atlantis\ProtectedAPI {
 
 	#[Common\Meta\Info('Called when a new post is first created.')]
 	protected function
-	HandlePluginsBlogPostEntityCreate(array $Plugins, Blog\Post $Post):
+	HandlePluginsBlogPostEntityCreate(Common\Datastore $Plugins, Blog\Post $Post):
 	void {
 
 		return;
@@ -387,7 +456,7 @@ extends Atlantis\ProtectedAPI {
 
 	#[Common\Meta\Info('Called when a post is updated.')]
 	protected function
-	HandlePluginsBlogPostEntityUpdate(array $Plugins, Blog\Post $Post):
+	HandlePluginsBlogPostEntityUpdate(Common\Datastore $Plugins, Blog\Post $Post):
 	void {
 
 		return;
@@ -395,7 +464,7 @@ extends Atlantis\ProtectedAPI {
 
 	#[Common\Meta\Info('Called after a post has been created or updated.')]
 	protected function
-	HandlePluginsBlogPostEntitySave(array $Plugins, Blog\Post $Post):
+	HandlePluginsBlogPostEntitySave(Common\Datastore $Plugins, Blog\Post $Post):
 	void {
 
 		$Class = NULL;

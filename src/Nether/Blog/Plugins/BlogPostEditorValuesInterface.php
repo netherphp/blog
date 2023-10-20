@@ -9,7 +9,7 @@ use Nether\Common;
 interface BlogPostEditorValuesInterface {
 
 	public function
-	GetValues(Atlantis\Engine $App, Common\Datastore $VData, ?Blog\Post $Post=NULL):
+	GetValues(Atlantis\Engine $App, Common\Datastore $PluginData, ?Blog\Post $Post=NULL):
 	Common\Datastore;
 
 };
