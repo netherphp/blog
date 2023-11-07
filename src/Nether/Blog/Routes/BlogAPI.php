@@ -283,10 +283,11 @@ extends Atlantis\ProtectedAPI {
 		->ID(Common\Filters\Numbers::IntType(...))
 		->OptUseLinkDate(Common\Filters\Numbers::BoolType(...))
 		->Plugins(Common\Filters\Text::TrimmedNullable(...))
-		->SiteTags(
-			Common\Filters\Lists::ArrayOf(...),
-			Common\Filters\Numbers::IntType(...)
-		);
+		->SiteTags([
+			(fn(Common\Struct\DatafilterItem $I)=> explode(',', $I->Value)),
+			[ Common\Filters\Lists::ArrayOf(...), Common\Filters\Text::TrimmedNullable(...) ],
+			[ Common\Filters\Lists::ArrayOf(...), Common\Filters\Numbers::IntType(...) ]
+		]);
 
 		////////
 
