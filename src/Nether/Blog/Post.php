@@ -510,6 +510,7 @@ implements
 
 		if($Input['BlogID'] !== NULL)
 		$SQL->Where('Main.BlogID=:BlogID');
+		//$SQL->Where(new Database\Coda\Equals('Main.BlogID', ':BlogID'));
 
 		if($Input['Enabled'] !== NULL)
 		$SQL->Where('Main.Enabled=:Enabled');
@@ -530,76 +531,77 @@ implements
 	FindExtendFilters_ByTagID(Database\Verse $SQL, Common\Datastore $Input):
 	void {
 
-		// @todo 2023-08-24 bob
-		// this code is technically functioning as an OR at the moment and
-		// im certain it should be an AND before progressing building
-		// against this too mcuh.
-
-		$TagID = NULL;
-		$TagIter = NULL;
-		$TableLink = NULL;
-
-		////////
-
 		if(!is_iterable($Input['TagID']))
 		return;
 
-		////////
+		$TLink = PostTagLink::GetTableInfo();
 
-		$TableLink = PostTagLink::GetTableInfo();
+		$GenBasicOr = (function() use($SQL, $Input, $TLink) {
 
-		////////
+			// this result set ends up being that of a logical or and
+			// i have yet to find a way to make it very useful.
 
-		$TagIter = 0;
-		$TableQA = NULL;
-		$FieldQA = NULL;
-
-		foreach($Input['TagID'] as $TagID) {
-			$TagIter += 1;
-
-			$TableQA = "TQA{$TagIter}";
-			$FieldQA = ":TagQA{$TagIter}";
+			$TableQA = "TQOR";
 
 			$SQL->Join(sprintf(
-				'%s %s ON Main.UUID=%s.EntityUUID',
-				$TableLink->Name,
-				$TableQA,
-				$TableQA
+				'%s ON %s=%s',
+				$TLink->GetAliasedTable($TableQA),
+				$SQL::MkQuotedField('Main', 'UUID'),
+				$SQL::MkQuotedField($TableQA, 'EntityUUID')
 			));
 
 			$SQL->Where(sprintf(
-				'%s.TagID=%s',
-				$TableQA,
-				$FieldQA
+				'%s=:TagID',
+				$SQL::MkQuotedField($TableQA, 'TagID')
 			));
 
-			$Input[$FieldQA] = $TagID;
-		}
+			if($Input['TagID'] instanceof Common\Datastore)
+			$Input['TagID'] = $Input['TagID']->GetData();
+
+			return;
+		});
+
+		$GenTrainAnd = (function() use($SQL, $Input, $TLink) {
+
+			// this method generates a logical and restriction upon the
+			// main table by joining each tag over and over and honestly
+			// it is unclear if this is going to be a good idea or not.
+
+			$Key = 0;
+			$ID = NULL;
+			$TableQA = NULL;
+			$FieldQA = NULL;
+
+			foreach($Input['TagID'] as $ID) {
+				$Key += 1;
+
+				$TableQA = "TQA{$Key}";
+				$FieldQA = ":TagQA{$Key}";
+
+				$SQL->Join(sprintf(
+					'%s ON %s=%s',
+					$TLink->GetAliasedTable($TableQA),
+					$SQL::MkQuotedField('Main', 'UUID'),
+					$SQL::MkQuotedField($TableQA, 'EntityUUID')
+				));
+
+				$SQL->Where(sprintf(
+					'%s=%s',
+					$SQL::MkQuotedField($TableQA, 'TagID'),
+					$FieldQA
+				));
+
+				$Input[$FieldQA] = $ID;
+			}
+
+			return;
+		});
+
+		//$GenBasicOr();
+		$GenTrainAnd();
 
 		//Common\Dump::Var($SQL, TRUE);
 		//Common\Dump::Var($Input, TRUE);
-
-		////////
-
-		/*
-		$SQL->Join(sprintf(
-			'%s TQ1 ON Main.UUID=TQ1.EntityUUID',
-			$TableLink->Name
-		));
-
-		$SQL->Where(sprintf(
-			'TQ1.TagID IN (:TagID)'
-		));
-
-		$SQL->Group('Main.ID');
-		*/
-
-		// @todo 2023-08-24 bob
-		// cant you update Database to be able to consume datastores
-		// already man like you're literally just punching yourself here.
-
-		//if($Input['TagID'] instanceof Common\Datastore)
-		//$Input['TagID'] = $Input['TagID']->GetData();
 
 		return;
 	}
