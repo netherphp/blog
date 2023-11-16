@@ -145,12 +145,16 @@ extends Atlantis\Prototype {
 	}
 
 	public function
-	GetRecentPosts(int $Page=1, int $Limit=10, bool $Drafts=FALSE, bool $SiteTags=TRUE):
+	GetRecentPosts(int $Page=1, int $Limit=10, bool $Drafts=FALSE, bool $SiteTags=TRUE, iterable $MoreTags=NULL):
 	Database\ResultSet {
 
 		if($SiteTags) {
 			$Tags = Util::FetchSiteTags();
 			$Tags->Remap(fn(Atlantis\Tag\Entity $T)=> $T->ID);
+		}
+
+		if($MoreTags) {
+			$Tags->MergeLeft($MoreTags);
 		}
 
 		return Post::Find([

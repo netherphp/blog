@@ -18,12 +18,16 @@ extends Atlantis\PublicWeb {
 
 		($this->Data)
 		->Page(Common\Filters\Numbers::Page(...))
-		->Drafts(Common\Filters\Numbers::BoolNullable(...));
+		->Drafts(Common\Filters\Numbers::BoolNullable(...))
+		->Tag(Common\Filters\Text::TrimmedNullable(...));
 
 		$Blog = NULL;
 		$BlogUser = NULL;
 		$Posts = NULL;
 		$ShowingDrafts = FALSE;
+
+		$Tag = NULL;
+		$MoreTags = [];
 
 		////////
 
@@ -46,9 +50,16 @@ extends Atlantis\PublicWeb {
 		//if($this->App->Local)
 		//$this->App->GetLocalData('Blog.Index.OptShowDrafts');
 
+		if($this->Data->Tag) {
+			$Tag = Atlantis\Tag\Entity::GetByField('Alias', $this->Data->Tag);
+
+			$MoreTags[] = $Tag->ID;
+		}
+
 		$Posts = $Blog->GetRecentPosts(
 			Page: $this->Data->Page,
-			Drafts: $ShowingDrafts
+			Drafts: $ShowingDrafts,
+			MoreTags: $MoreTags
 		);
 
 		// clearly not really the popular posts atm.

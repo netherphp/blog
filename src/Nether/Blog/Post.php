@@ -536,6 +536,7 @@ implements
 		// against this too mcuh.
 
 		$TagID = NULL;
+		$TagIter = NULL;
 		$TableLink = NULL;
 
 		////////
@@ -547,6 +548,40 @@ implements
 
 		$TableLink = PostTagLink::GetTableInfo();
 
+		////////
+
+		$TagIter = 0;
+		$TableQA = NULL;
+		$FieldQA = NULL;
+
+		foreach($Input['TagID'] as $TagID) {
+			$TagIter += 1;
+
+			$TableQA = "TQA{$TagIter}";
+			$FieldQA = ":TagQA{$TagIter}";
+
+			$SQL->Join(sprintf(
+				'%s %s ON Main.UUID=%s.EntityUUID',
+				$TableLink->Name,
+				$TableQA,
+				$TableQA
+			));
+
+			$SQL->Where(sprintf(
+				'%s.TagID=%s',
+				$TableQA,
+				$FieldQA
+			));
+
+			$Input[$FieldQA] = $TagID;
+		}
+
+		//Common\Dump::Var($SQL, TRUE);
+		//Common\Dump::Var($Input, TRUE);
+
+		////////
+
+		/*
 		$SQL->Join(sprintf(
 			'%s TQ1 ON Main.UUID=TQ1.EntityUUID',
 			$TableLink->Name
@@ -557,13 +592,14 @@ implements
 		));
 
 		$SQL->Group('Main.ID');
+		*/
 
 		// @todo 2023-08-24 bob
 		// cant you update Database to be able to consume datastores
 		// already man like you're literally just punching yourself here.
 
-		if($Input['TagID'] instanceof Common\Datastore)
-		$Input['TagID'] = $Input['TagID']->GetData();
+		//if($Input['TagID'] instanceof Common\Datastore)
+		//$Input['TagID'] = $Input['TagID']->GetData();
 
 		return;
 	}
