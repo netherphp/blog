@@ -510,7 +510,6 @@ implements
 
 		if($Input['BlogID'] !== NULL)
 		$SQL->Where('Main.BlogID=:BlogID');
-		//$SQL->Where(new Database\Coda\Equals('Main.BlogID', ':BlogID'));
 
 		if($Input['Enabled'] !== NULL)
 		$SQL->Where('Main.Enabled=:Enabled');
