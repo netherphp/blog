@@ -366,27 +366,26 @@ extends Atlantis\ProtectedAPI {
 		// complain if this framework is configured to use site tags but
 		// this post has none.
 
-		if(count($SiteTagsConf) && !$SiteTags->Count())
-		$this->Quit(4, 'No site tags have been selected.');
+		if((count($SiteTagsConf) && $SiteTags->Count()) || (count($SiteTagsConf)===0 && $SiteTags->Count()===0)) {
+			// add the tags that do not exist and de-index the ones that do so
+			// we can strip off any now unused tags.
 
-		// add the tags that do not exist and de-index the ones that do so
-		// we can strip off any now unused tags.
+			$SiteTags->Each(function(Atlantis\Tag\Entity $Tag) use($Post, &$SiteTagsCurr) {
+				if(!isset($SiteTagsCurr[$Tag->ID])) {
+					Blog\BlogTagLink::InsertByPair($Tag->ID, $Post->UUID);
+					return;
+				}
 
-		$SiteTags->Each(function(Atlantis\Tag\Entity $Tag) use($Post, &$SiteTagsCurr) {
-			if(!isset($SiteTagsCurr[$Tag->ID])) {
-				Blog\BlogTagLink::InsertByPair($Tag->ID, $Post->UUID);
+				unset($SiteTagsCurr[$Tag->ID]);
 				return;
-			}
+			});
 
-			unset($SiteTagsCurr[$Tag->ID]);
-			return;
-		});
-
-		Common\Datastore::FromArray($SiteTagsCurr)
-		->Each(function(Atlantis\Tag\Entity $Tag) use($Post) {
-			Atlantis\Tag\EntityLink::DeleteByPair($Tag->ID, $Post->UUID);
-			return;
-		});
+			Common\Datastore::FromArray($SiteTagsCurr)
+			->Each(function(Atlantis\Tag\Entity $Tag) use($Post) {
+				Atlantis\Tag\EntityLink::DeleteByPair($Tag->ID, $Post->UUID);
+				return;
+			});
+		}
 
 		////////////////
 		////////////////
