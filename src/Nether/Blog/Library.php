@@ -14,7 +14,6 @@ extends Common\Library
 implements
 	Atlantis\Plugins\DashboardSidebarInterface,
 	Atlantis\Plugins\DashboardElementInterface,
-//	Atlantis\Plugins\AccessTypeDefineInterface,
 	Atlantis\Plugins\UploadHandlerInterface,
 	Atlantis\Plugin\LibraryInterface {
 
@@ -106,30 +105,6 @@ implements
 
 		if(count($Blogs))
 		$Elements->Push(new Dashboard\BlogElement($App, $Blogs));
-
-		return;
-	}
-
-	////////////////////////////////////////////////////////////////
-	// AccessTypeDefineInterface ///////////////////////////////////
-
-	public function
-	OnAccessTypeDefine(Atlantis\Engine $App, Common\Datastore $List):
-	void {
-
-		if(!$App->Config[static::ConfEnable])
-		return;
-
-		$List->MergeRight([
-			new Atlantis\User\AccessTypeDef(
-				static::AccessBlogCreate, 1,
-				'Allows user to create new blogs.'
-			),
-			new Atlantis\User\AccessTypeDef(
-				static::AccessBlogCreate, 0,
-				'Prevent user from creating new blogs.'
-			)
-		]);
 
 		return;
 	}
