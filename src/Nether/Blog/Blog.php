@@ -148,6 +148,8 @@ extends Atlantis\Prototype {
 	GetRecentPosts(int $Page=1, int $Limit=10, bool $Drafts=FALSE, bool $SiteTags=TRUE, iterable $MoreTags=NULL):
 	Database\ResultSet {
 
+		$Tags = new Common\Datastore;
+
 		if($SiteTags) {
 			$Tags = Util::FetchSiteTags();
 			$Tags->Remap(fn(Atlantis\Tag\Entity $T)=> $T->ID);
