@@ -484,6 +484,18 @@ implements
 		return $Result;
 	}
 
+	static public function
+	BuildEditMenu(Atlantis\Engine $App):
+	Atlantis\Struct\DropdownMenu {
+
+		$Menu = Atlantis\Struct\DropdownMenu::New();
+		$Break = [ [ 'Title' => '-' ] ];
+		$Items = NULL;
+		$Item = NULL;
+
+		return $Menu;
+	}
+
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
 
