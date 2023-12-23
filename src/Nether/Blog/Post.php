@@ -498,7 +498,8 @@ implements
 		]);
 
 		$Profiles = Atlantis\Profile\Entity::Find([
-			'UUID' => $UUID->GetData()
+			'UseSiteTags' => FALSE,
+			'UUID'        => $UUID->GetData()
 		]);
 
 		return $Profiles;
