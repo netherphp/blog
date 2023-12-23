@@ -484,6 +484,26 @@ implements
 		return $Result;
 	}
 
+	#[Common\Meta\Date('2023-12-22')]
+	public function
+	FetchRelatedProfiles():
+	Database\ResultSet {
+
+		$UUID = Atlantis\Struct\EntityRelationship::Find([
+			'EntityUUID' => $this->UUID,
+			'EntityType' => 'Profile.Entity',
+			'Remappers'  => [
+				fn($I)=> Atlantis\Struct\EntityRelationship::KeepTheOtherOne($I, $this->UUID)
+			]
+		]);
+
+		$Profiles = Atlantis\Profile\Entity::Find([
+			'UUID' => $UUID->GetData()
+		]);
+
+		return $Profiles;
+	}
+
 	static public function
 	BuildEditMenu(Atlantis\Engine $App):
 	Atlantis\Struct\DropdownMenu {

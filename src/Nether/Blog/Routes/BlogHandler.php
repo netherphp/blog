@@ -121,6 +121,7 @@ extends Atlantis\PublicWeb {
 
 		$PostPhotos = $Post->FetchPhotos();
 		$PostVideos = $Post->FetchVideos();
+		$PostProfiles = $Post->FetchRelatedProfiles();
 
 		////////
 
@@ -136,6 +137,7 @@ extends Atlantis\PublicWeb {
 			'Post'     => $Post,
 			'Photos'   => $PostPhotos,
 			'Videos'   => $PostVideos,
+			'Profiles' => $PostProfiles,
 			'BlogUser' => $BlogUser
 		]);
 
