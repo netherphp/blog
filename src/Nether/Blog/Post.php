@@ -528,7 +528,8 @@ implements
 		->Define('BlogID', NULL)
 		->Define('Enabled', 1)
 		->Define('Sort', 'newest')
-		->Define('Schedule', TRUE);
+		->Define('Schedule', TRUE)
+		->Define('SearchTitle', NULL);
 
 		$Input['TagID'] ??= NULL;
 
@@ -546,6 +547,11 @@ implements
 
 		if($Input['Enabled'] !== NULL)
 		$SQL->Where('Main.Enabled=:Enabled');
+
+		if($Input['SearchTitle'] !== NULL) {
+			$Input['LikeSearchTitle'] = "%{$Input['SearchTitle']}%";
+			$SQL->Where('Main.Title LIKE :LikeSearchTitle');
+		}
 
 		if($Input['Schedule'] !== NULL) {
 			if($Input['Schedule'] === TRUE) {

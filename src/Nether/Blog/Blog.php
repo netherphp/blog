@@ -145,7 +145,7 @@ extends Atlantis\Prototype {
 	}
 
 	public function
-	GetRecentPosts(int $Page=1, int $Limit=10, bool $Drafts=FALSE, bool $SiteTags=TRUE, iterable $MoreTags=NULL):
+	GetRecentPosts(int $Page=1, int $Limit=10, bool $Drafts=FALSE, bool $SiteTags=TRUE, iterable $MoreTags=NULL, ?string $SearchTitle=NULL):
 	Database\ResultSet {
 
 		$Tags = new Common\Datastore;
@@ -160,13 +160,14 @@ extends Atlantis\Prototype {
 		}
 
 		return Post::Find([
-			'TagID'    => $Tags->Count() ? $Tags : NULL,
-			'BlogID'   => $this->ID,
-			'Enabled'  => $Drafts ? 0 : 1,
-			'Schedule' => $Drafts ? NULL : TRUE,
-			'Page'     => $Page,
-			'Limit'    => $Limit,
-			'Sort'     => 'newest'
+			'TagID'       => $Tags->Count() ? $Tags : NULL,
+			'BlogID'      => $this->ID,
+			'SearchTitle' => $SearchTitle,
+			'Enabled'     => $Drafts ? 0 : 1,
+			'Schedule'    => $Drafts ? NULL : TRUE,
+			'Page'        => $Page,
+			'Limit'       => $Limit,
+			'Sort'        => 'newest'
 		]);
 	}
 

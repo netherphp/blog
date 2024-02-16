@@ -14,11 +14,7 @@ extends Common\Library
 implements
 	Atlantis\Plugins\DashboardSidebarInterface,
 	Atlantis\Plugins\DashboardElementInterface,
-	Atlantis\Plugins\UploadHandlerInterface,
-	Atlantis\Plugin\LibraryInterface {
-
-	use
-	Atlantis\Plugin\LibraryPackage;
+	Atlantis\Plugins\UploadHandlerInterface {
 
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
@@ -37,11 +33,11 @@ implements
 			static::ConfPostURL    => '/+:BlogAlias:/:PostID:/:PostAlias:'
 		]);
 
-		($App->Plugins)
-		->Register(
-			Atlantis\Plugins\AccessTypeDefineInterface::class,
-			Plugins\AccessTypeDefine::class
-		);
+		//($App->Plugins)
+		//->Register(
+		//	Atlantis\Plugins\AccessTypeDefineInterface::class,
+		//	Plugins\AccessTypeDefine::class
+		//);
 
 		BlogTagLink::Register();
 		PostTagLink::Register();
