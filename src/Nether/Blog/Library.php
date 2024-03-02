@@ -39,6 +39,9 @@ implements
 		//	Plugins\AccessTypeDefine::class
 		//);
 
+		$App->Plugins->RegisterInterfaceNamespace('Nether\Blog\Plugin\Interfaces');
+		$App->Plugins->Register(Plugins\BlogPostAdminMenuDefault::class);
+
 		BlogTagLink::Register();
 		PostTagLink::Register();
 		Atlantis\Struct\EntityRelationship::Register('Blog.Entity', Blog::class);

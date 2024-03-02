@@ -17,6 +17,9 @@ extends Atlantis\Prototype
 implements
 	Atlantis\Packages\ExtraDataInterface {
 
+	const
+	EntType = 'Blog.Post';
+
 	use
 	Atlantis\Packages\CoverImage {
 		HasCoverImage        as HasPostImage;

@@ -7,8 +7,8 @@ use Nether\Avenue;
 use Nether\Blog;
 use Nether\Common;
 
-use Nether\Blog\Plugin\Interfaces\PostView\AdminMenuAuditInterface;
-use Nether\Blog\Plugin\Interfaces\PostView\AdminMenuSectionInterface;
+use Nether\Blog\Plugin\Interfaces\AdminMenuAuditInterface;
+use Nether\Blog\Plugin\Interfaces\AdminMenuSectionInterface;
 
 class BlogHandler
 extends Atlantis\PublicWeb {
@@ -130,13 +130,12 @@ extends Atlantis\PublicWeb {
 		$PostVideos = $Post->FetchVideos();
 		$PostProfiles = $Post->FetchRelatedProfiles();
 
-		/*
+
 		$AdminMenu = static::BlogPostViewAdminMenu(
 			$this->App,
 			$Post,
 			$ExtraData
 		);
-		*/
 
 		////////
 
