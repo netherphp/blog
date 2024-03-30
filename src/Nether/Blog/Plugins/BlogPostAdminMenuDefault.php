@@ -113,13 +113,8 @@ implements Blog\Plugin\Interfaces\AdminMenuSectionInterface {
 			Icon: 'mdi-upload',
 			Attr: $Post->GetDataAttr([ 'photolib-cmd'=> 'upload', 'parent-type'=> Blog\Key::EntityTypePost, 'parent-uuid'=> $Post->UUID ], TRUE)
 		))
-		->Shove('ProfileMediaAddVideoURL', Atlantis\Struct\DropdownItem::New(
-			Title: 'Add Video URL',
-			Icon: 'mdi-video-plus',
-			Attr: $Post->GetDataAttr([ 'videotp-cmd'=> 'new', 'parent-type'=> Blog\Key::EntityTypePost, 'parent-uuid'=> $Post->UUID ], TRUE)
-		))
 		->Shove('ProfileMediaAddVideoURL2', Atlantis\Struct\DropdownItem::New(
-			Title: 'Add Video (New)',
+			Title: 'Add Video',
 			Icon: 'mdi-video-plus',
 			Attr: $Post->GetDataAttr([ 'videotp-cmd'=> 'new2', 'other-type'=> Blog\Key::EntityTypePost, 'other-uuid'=> $Post->UUID ], TRUE)
 		));
