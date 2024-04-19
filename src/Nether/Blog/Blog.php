@@ -145,7 +145,7 @@ extends Atlantis\Prototype {
 	}
 
 	public function
-	GetRecentPosts(int $Page=1, int $Limit=10, bool $Drafts=FALSE, bool $SiteTags=TRUE, iterable $MoreTags=NULL, ?string $SearchTitle=NULL):
+	GetRecentPosts(int $Page=1, int $Limit=10, ?bool $Drafts=FALSE, bool $SiteTags=TRUE, iterable $MoreTags=NULL, ?string $SearchTitle=NULL):
 	Database\ResultSet {
 
 		$Tags = new Common\Datastore;
@@ -163,7 +163,7 @@ extends Atlantis\Prototype {
 			'TagID'       => $Tags->Count() ? $Tags : NULL,
 			'BlogID'      => $this->ID,
 			'SearchTitle' => $SearchTitle,
-			'Enabled'     => $Drafts ? 0 : 1,
+			'Enabled'     => $Drafts === NULL ? $Drafts : (int)$Drafts,
 			'Schedule'    => $Drafts ? NULL : TRUE,
 			'Page'        => $Page,
 			'Limit'       => $Limit,
@@ -197,6 +197,9 @@ extends Atlantis\Prototype {
 	string {
 
 		$Format = Library::Get(Library::ConfPostURL);
+		$STags = $Post->GetTags(Atlantis\Tag\Entity::KeepThoseTypedSite(...));
+
+		////////
 
 		$Tokens = [
 			':BlogID:'    => $this->ID,
@@ -212,7 +215,9 @@ extends Atlantis\Prototype {
 		foreach($Tokens as $Token => $Value)
 		$Output = str_replace($Token, $Value, $Output);
 
-		return $Output;
+		////////
+
+		return Atlantis\Util::RewriteURL($Output, $STags);
 	}
 
 	public function

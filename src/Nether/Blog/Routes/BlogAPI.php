@@ -147,15 +147,23 @@ extends Atlantis\ProtectedAPI {
 	void {
 
 		($this->Data)
-		->Editor(Common\Filters\Text::Trimmed(...))
 		->BlogID(Common\Filters\Numbers::IntType(...))
-		->Title(Common\Filters\Text::Trimmed(...))
-		->Alias(Common\Filters\Text::Trimmed(...))
-		->Content(Common\Filters\Text::Trimmed(...))
+		->Editor(Common\Filters\Text::TrimmedNullable(...))
+		->Title(Common\Filters\Text::TrimmedNullable(...))
+		->Alias(Common\Filters\Text::TrimmedNullable(...))
+		->Content(Common\Filters\Text::TrimmedNullable(...))
 		->CoverImageID(Common\Filters\Numbers::IntNullable(...))
 		->Enabled(Common\Filters\Numbers::IntType(...))
 		->OptUseLinkDate(Common\Filters\Numbers::BoolType(...))
 		->Plugins(Common\Filters\Text::TrimmedNullable(...))
+		->Date(function(Common\Struct\DatafilterItem $I){
+			$Val = Common\Filters\Text::TrimmedNullable($I->Value);
+			return $Val ?? (new Common\Date)->Get(Common\Values::DateFormatYMD);
+		})
+		->PostPhoto(
+			fn(Common\Struct\DatafilterItem $In)=>
+			isset($_FILES['PostPhoto']) ? $_FILES['PostPhoto'] : NULL
+		)
 		->SiteTags(
 			Common\Filters\Lists::ArrayOf(...),
 			Common\Filters\Numbers::IntType(...)
@@ -238,12 +246,23 @@ extends Atlantis\ProtectedAPI {
 
 			// associate the default site tags with the posts.
 
-			if(count($SiteTagConf) && !$SiteTags->Count())
-			$this->Quit(5, 'No site tags have been selected.');
+			//if(count($SiteTagConf) && !$SiteTags->Count())
+			//$this->Quit(5, 'No site tags have been selected.');
 
 			if($SiteTags && $SiteTags->Count())
 			foreach($SiteTags as $Tag) {
 				Blog\PostTagLink::InsertByPair($Tag->ID, $Post->UUID);
+			}
+
+			if($this->Data->PostPhoto) {
+				$Importer = Atlantis\Util\FileUploadImporter::FromUploadItem(
+					$this->App,
+					$this->Data->PostPhoto
+				);
+
+				$Image = $Importer->GetFileObject();
+
+				$Post->Update([ 'CoverImageID'=> $Image->ID ]);
 			}
 
 			// run the plugin apis.
@@ -263,6 +282,7 @@ extends Atlantis\ProtectedAPI {
 			$this->Quit(PHP_INT_MAX, "WTF: {$Err->GetMessage()}");
 		}
 
+		$this->SetPayload($Post->DescribeForPublicAPI());
 		$this->SetGoto($Post->GetURL());
 
 		return;

@@ -89,18 +89,9 @@ implements
 	$Title;
 
 	#[Database\Meta\TypeVarChar(Size: 32, Default: 'html')]
+	#[Common\Meta\PropertyListable]
 	public string
 	$Editor;
-
-	#[Database\Meta\TypeText]
-	#[Common\Meta\PropertyPatchable]
-	#[Common\Meta\PropertyFilter([ Common\Filters\Text::class ,'Trimmed'])]
-	public string
-	$Content;
-
-	#[Database\Meta\TypeText]
-	public string
-	$ContentHTML;
 
 	#[Database\Meta\TypeIntTiny(Default: 0, Nullable: FALSE)]
 	#[Common\Meta\PropertyListable]
@@ -115,6 +106,16 @@ implements
 	#[Common\Meta\PropertyFilter([ Common\Filters\Numbers::class, 'IntType'])]
 	public int
 	$OptComments;
+
+	#[Database\Meta\TypeText]
+	#[Common\Meta\PropertyPatchable]
+	#[Common\Meta\PropertyFilter([ Common\Filters\Text::class ,'Trimmed'])]
+	public string
+	$Content;
+
+	#[Database\Meta\TypeText]
+	public string
+	$ContentHTML;
 
 	use
 	Atlantis\Packages\ExtraData;
@@ -225,9 +226,26 @@ implements
 	DescribeForPublicAPI():
 	array {
 
-		$Data = parent::DescribeForPublicAPI();
+		$Blog = $this->Blog->DescribeForPublicAPI();
 
-		return $Data;
+		$Tags = $this->GetTags()->Remap(
+			fn(Atlantis\Tag\Entity $T)
+			=> $T->DescribeForPublicAPI()
+		);
+
+		$Output = [
+			'ID'            => $this->ID,
+			'UUID'          => $this->UUID,
+			'Editor'        => $this->Editor,
+			'Alias'         => $this->Alias,
+			'Title'         => $this->Title,
+			'PageURL'       => $this->GetURL(),
+			'CoverImageURL' => $this->GetCoverImageURL(),
+			'Tags'          => $Tags,
+			'Blog'          => $Blog
+		];
+
+		return $Output;
 	}
 
 	////////////////////////////////////////////////////////////////
@@ -741,6 +759,16 @@ implements
 			break;
 			case 'oldest':
 				$SQL->Sort('Main.TimeSorted', $SQL::SortAsc);
+				break;
+			break;
+
+			case 'added':
+				$SQL->Sort('Main.TimeCreated', $SQL::SortDesc);
+				break;
+			break;
+
+			case 'updated':
+				$SQL->Sort('Main.TimeUpdated', $SQL::SortDesc);
 				break;
 			break;
 		}
