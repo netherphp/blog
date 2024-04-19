@@ -163,7 +163,7 @@ extends Atlantis\Prototype {
 			'TagID'       => $Tags->Count() ? $Tags : NULL,
 			'BlogID'      => $this->ID,
 			'SearchTitle' => $SearchTitle,
-			'Enabled'     => $Drafts === NULL ? $Drafts : (int)$Drafts,
+			'Enabled'     => $Drafts ? 0 : 1,
 			'Schedule'    => $Drafts ? NULL : TRUE,
 			'Page'        => $Page,
 			'Limit'       => $Limit,
