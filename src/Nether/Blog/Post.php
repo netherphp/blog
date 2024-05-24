@@ -507,7 +507,7 @@ implements
 
 	#[Common\Meta\Date('2023-12-22')]
 	public function
-	FetchRelatedProfiles():
+	FetchRelatedProfiles(?array $TagsAll=NULL):
 	Database\ResultSet {
 
 		$UUID = Atlantis\Struct\EntityRelationship::Find([
