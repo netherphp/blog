@@ -15,7 +15,7 @@ use Exception;
 class Post
 extends Atlantis\Prototype
 implements
-	Atlantis\Packages\ExtraDataInterface {
+	Atlantis\Interfaces\ExtraDataInterface {
 
 	const
 	EntType = 'Blog.Post';
