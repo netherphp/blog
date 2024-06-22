@@ -228,9 +228,20 @@ extends Atlantis\ProtectedWeb {
 	BlogSettings(Blog\Blog $Blog):
 	void {
 
+		$PageTitle = sprintf('Blog Settings - %s', $Blog->Title);
+
+		$Trail = Common\Datastore::FromArray([
+			Atlantis\Struct\Item::New(UUID: 'blog', Title: 'Blog', URL: '/dashboard/blog'),
+			Atlantis\Struct\Item::New(UUID: 'bsettings', Title: "Settings: {$Blog->Title}")
+		]);
+
+		////////
+
 		($this->Surface)
-		->Wrap('blog/dashboard/blog-settings', [
-			'Blog'  => $Blog
+		->Set('Page.Title', $PageTitle)
+		->Area('blog/dashboard/blog-settings', [
+			'Blog'  => $Blog,
+			'Trail' => $Trail
 		]);
 
 		return;
