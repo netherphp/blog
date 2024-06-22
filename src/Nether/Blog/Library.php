@@ -25,6 +25,8 @@ implements
 
 		$App = Atlantis\Engine::From($Argv);
 
+		////////
+
 		($App->Config)
 		->BlendRight([
 			static::ConfEnable     => TRUE,
@@ -33,14 +35,9 @@ implements
 			static::ConfPostURL    => '/+:BlogAlias:/:PostID:/:PostAlias:'
 		]);
 
-		//($App->Plugins)
-		//->Register(
-		//	Atlantis\Plugins\AccessTypeDefineInterface::class,
-		//	Plugins\AccessTypeDefine::class
-		//);
-
 		$App->Plugins->RegisterInterfaceNamespace('Nether\Blog\Plugin\Interfaces');
 		$App->Plugins->Register(Plugins\BlogPostAdminMenuDefault::class);
+		$App->Plugins->Register(Plugins\FileUploadHandler::class);
 
 		BlogTagLink::Register();
 		PostTagLink::Register();
