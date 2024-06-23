@@ -11,7 +11,8 @@ class Key {
 	ConfBlogURL       = 'Nether.Blog.BlogURL',
 	ConfPostURL       = 'Nether.Blog.PostURL',
 	ConfBlogSiteTags  = 'Nether.Blog.SiteTags',
-	ConfBlogIndexArea = 'Nether.Blog.IndexArea';
+	ConfBlogIndexArea = 'Nether.Blog.IndexArea',
+	ConfEditorDefault = 'NEther.Blog.Editor.Default';
 
 	const
 	AccessBlogCreate = 'Nether.Blog.Create';

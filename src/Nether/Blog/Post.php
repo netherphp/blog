@@ -212,7 +212,9 @@ implements
 		////////
 
 		if(array_key_exists('Content', $Dataset))
-		$Dataset['ContentHTML'] = $this->ParseContent($Dataset['Content']);
+		$Dataset['ContentHTML'] = $this->ParseContent(
+			$Dataset['Content']
+		);
 
 		////////
 
@@ -364,6 +366,9 @@ implements
 		////////
 
 		return match($Editor) {
+			'editorjs'
+			=> $this->ParseContentAsEditorJS($Input),
+
 			'json'
 			=> $this->ParseContentAsJSON($Input),
 
@@ -373,6 +378,15 @@ implements
 			default
 			=> $this->ParseContentAsHTML($Input)
 		};
+	}
+
+	public function
+	ParseContentAsEditorJS(string $Input):
+	string {
+
+		// ...
+
+		return '';
 	}
 
 	public function

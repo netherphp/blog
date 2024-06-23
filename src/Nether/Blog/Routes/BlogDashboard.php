@@ -129,6 +129,92 @@ extends Atlantis\ProtectedWeb {
 		return Avenue\Response::CodeOK;
 	}
 
+	#[Atlantis\Meta\RouteHandler('/dashboard/blog/post')]
+	#[Atlantis\Meta\RouteAccessTypeUser]
+	#[Avenue\Meta\ConfirmWillAnswerRequest]
+	public function
+	BlogPost():
+	void {
+
+		($this->Data)
+		->ID(Common\Filters\Numbers::IntNullable(...))
+		->Plugins(Common\Filters\Text::TrimmedNullable(...))
+		->Editor([
+			Common\Filters\Text::SlottableKey(...),
+			Common\Filters\Text::TrimmedNullable(...)
+		]);
+
+		$Trail = Common\Datastore::FromArray([
+			Atlantis\Struct\Item::New(UUID: 'blog', Title: 'Blog', URL: '/dashboard/blog'),
+			Atlantis\Struct\Item::New(UUID: 'bwrite', Title: "Write New Post")
+		]);
+
+		////////
+
+		$PluginData = $this->Data->Plugins;
+		$Plugins = Blog\Struct\BlogPostPluginData::FromEncoded($PluginData);
+		$Values = new Common\Datastore;
+
+		$SiteTagConf = $this->App->Config[Atlantis\Key::ConfSiteTags] ?: [];
+		$SiteTags = (
+			Atlantis\Util::FetchSiteTagsAll()
+			->Remap(function(Atlantis\Tag\Entity $Tag) use($SiteTagConf) {
+				return (object)[
+					'Tag'      => $Tag,
+					'Selected' => in_array($Tag->Alias, $SiteTagConf)
+				];
+			})
+		);
+
+		if($Plugins->Values->Count())
+		$Values->MergeRight($Plugins->GetValues($this->App));
+
+		////////
+
+		$Blogs = Blog\BlogUser::Find([
+			'UserID'    => $this->User->ID,
+			'Writer'    => 1,
+			'Remappers' => [ fn(Blog\BlogUser $BU)=> $BU->Blog ]
+		]);
+
+		($this->Surface)
+		->Area('blog/dashboard/blog-write', [
+			'Trail'       => $Trail,
+
+			'Post'        => NULL,
+			'Values'      => $Values,
+			'Editor'      => $this->Data->Editor,
+			'Blogs'       => $Blogs,
+			'SiteTags'    => $SiteTags,
+			'PluginData'  => $PluginData
+		]);
+
+		return;
+	}
+
+	protected function
+	BlogPostWillAnswerRequest():
+	int {
+
+		// if a specific blog was asked for but the user cannot write
+		// to that blog then it needs to bail.
+
+		if($this->Data->ID) {
+			$BlogUser = Blog\BlogUser::GetByPair(
+				(int)$this->Data->ID,
+				$this->User->ID
+			);
+
+			if(!$BlogUser)
+			return Avenue\Response::CodeForbidden;
+
+			if(!$BlogUser->CanWrite())
+			return Avenue\Response::CodeForbidden;
+		}
+
+		return Avenue\Response::CodeOK;
+	}
+
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
 
@@ -224,6 +310,7 @@ extends Atlantis\ProtectedWeb {
 	#[Atlantis\Meta\RouteHandler('/dashboard/blog/settings')]
 	#[Atlantis\Meta\RouteAccessTypeUser]
 	#[Avenue\Meta\ConfirmWillAnswerRequest]
+	#[Avenue\Meta\ExtraDataArgs]
 	public function
 	BlogSettings(Blog\Blog $Blog):
 	void {

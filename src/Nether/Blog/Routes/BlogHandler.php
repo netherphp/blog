@@ -111,6 +111,7 @@ extends Atlantis\PublicWeb {
 
 	#[Avenue\Meta\RouteHandler('@Nether.Blog.PostURL')]
 	#[Avenue\Meta\ConfirmWillAnswerRequest]
+	#[Avenue\Meta\ExtraDataArgs]
 	public function
 	ViewPost(string $BlogAlias, int $PostID, ?string $PostAlias, Blog\Post $Post):
 	void {

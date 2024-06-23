@@ -221,6 +221,16 @@ extends Atlantis\Prototype {
 	}
 
 	public function
+	GetBlockEditorURL():
+	string {
+
+		return sprintf(
+			'/dashboard/blog/editor/%s',
+			$this->UUID
+		);
+	}
+
+	public function
 	GetWriteURL():
 	string {
 

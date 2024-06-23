@@ -29,10 +29,11 @@ implements
 
 		($App->Config)
 		->BlendRight([
-			static::ConfEnable     => TRUE,
-			static::ConfStorageKey => 'Default',
-			static::ConfBlogURL    => '/+:BlogAlias:',
-			static::ConfPostURL    => '/+:BlogAlias:/:PostID:/:PostAlias:'
+			Key::ConfEnable        => TRUE,
+			Key::ConfStorageKey    => 'Default',
+			Key::ConfBlogURL       => '/+:BlogAlias:',
+			Key::ConfPostURL       => '/+:BlogAlias:/:PostID:/:PostAlias:',
+			Key::ConfEditorDefault => 'html'
 		]);
 
 		$App->Plugins->RegisterInterfaceNamespace('Nether\Blog\Plugin\Interfaces');
