@@ -1,4 +1,5 @@
-<?php
+<?php ##########################################################################
+################################################################################
 
 namespace Nether\Blog;
 
@@ -10,6 +11,9 @@ use Nether\Database;
 use Nether\User;
 
 use Exception;
+
+################################################################################
+################################################################################
 
 #[Database\Meta\TableClass('BlogPosts', 'BP')]
 class Post
@@ -27,6 +31,9 @@ implements
 		GetCoverImageSizeURL as GetPostImageSizeURL;
 	}
 
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE)]
 	#[Database\Meta\ForeignKey('Blogs', 'ID')]
 	public int
@@ -38,23 +45,64 @@ implements
 	$UserID;
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: NULL)]
+	#[Database\Meta\FieldIndex]
+	#[Common\Meta\PropertyPatchable]
+	#[Common\Meta\PropertyFilter([ Common\Filters\Numbers::class, 'IntType' ])]
 	public int
 	$TimeCreated;
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: NULL)]
+	#[Database\Meta\FieldIndex]
+	#[Common\Meta\PropertyPatchable]
+	#[Common\Meta\PropertyFilter([ Common\Filters\Numbers::class, 'IntType' ])]
 	public int
 	$TimeUpdated;
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: NULL)]
 	#[Database\Meta\FieldIndex]
+	#[Common\Meta\PropertyPatchable]
+	#[Common\Meta\PropertyFilter([ Common\Filters\Numbers::class, 'IntType' ])]
 	public int
 	$TimeSorted;
 
 	#[Database\Meta\TypeIntTiny(Default: 0, Nullable: FALSE)]
+	#[Common\Meta\PropertyListable]
 	#[Common\Meta\PropertyPatchable]
 	#[Common\Meta\PropertyFilter([ Common\Filters\Numbers::class, 'IntType' ])]
 	public int
 	$Enabled;
+
+	#[Database\Meta\TypeVarChar(Size: 255)]
+	#[Database\Meta\FieldIndex]
+	#[Common\Meta\PropertyListable]
+	#[Common\Meta\PropertyPatchable]
+	#[Common\Meta\PropertyFilter([ Common\Filters\Text::class ,'Trimmed'])]
+	public string
+	$Alias;
+
+	#[Database\Meta\TypeVarChar(Size: 255)]
+	#[Common\Meta\PropertyListable]
+	#[Common\Meta\PropertyPatchable]
+	#[Common\Meta\PropertyFilter([ Common\Filters\Text::class ,'Trimmed'])]
+	public string
+	$Title;
+
+	#[Database\Meta\TypeVarChar(Size: 32, Default: 'html')]
+	#[Common\Meta\PropertyListable]
+	public string
+	$Editor;
+
+	#[Database\Meta\TypeText]
+	#[Common\Meta\PropertyPatchable]
+	#[Common\Meta\PropertyFilter([ Common\Filters\Text::class ,'Trimmed'])]
+	public string
+	$Content;
+
+	#[Database\Meta\TypeText]
+	public string
+	$ContentHTML;
+
+	////////
 
 	#[Database\Meta\TypeIntBig(Unsigned: TRUE, Default: 0)]
 	public int
@@ -76,23 +124,6 @@ implements
 	public int
 	$TimeToRead;
 
-	#[Database\Meta\TypeVarChar(Size: 255)]
-	#[Common\Meta\PropertyListable]
-	public string
-	$Alias;
-
-	#[Database\Meta\TypeVarChar(Size: 255)]
-	#[Common\Meta\PropertyListable]
-	#[Common\Meta\PropertyPatchable]
-	#[Common\Meta\PropertyFilter([ Common\Filters\Text::class ,'Trimmed'])]
-	public string
-	$Title;
-
-	#[Database\Meta\TypeVarChar(Size: 32, Default: 'html')]
-	#[Common\Meta\PropertyListable]
-	public string
-	$Editor;
-
 	#[Database\Meta\TypeIntTiny(Default: 0, Nullable: FALSE)]
 	#[Common\Meta\PropertyListable]
 	#[Common\Meta\PropertyPatchable]
@@ -106,16 +137,6 @@ implements
 	#[Common\Meta\PropertyFilter([ Common\Filters\Numbers::class, 'IntType'])]
 	public int
 	$OptComments;
-
-	#[Database\Meta\TypeText]
-	#[Common\Meta\PropertyPatchable]
-	#[Common\Meta\PropertyFilter([ Common\Filters\Text::class ,'Trimmed'])]
-	public string
-	$Content;
-
-	#[Database\Meta\TypeText]
-	public string
-	$ContentHTML;
 
 	use
 	Atlantis\Packages\ExtraData;
@@ -174,30 +195,52 @@ implements
 	array {
 
 		$Output = parent::Patch($Input);
+		$ExtraData = NULL;
+
+		////////
+
+		if(isset($Input['ExtraData']))
+		$ExtraData = Common\Datastore::FromArray($Input['ExtraData']);
+
+		////////
+
+		// keep the alias in sync with the title.
 
 		if(array_key_exists('Title', $Output))
 		$Output['Alias'] = Common\Filters\Text::SlottableKey($Output['Title']);
 
+		// handle formatting the content.
+
 		if(array_key_exists('Content', $Output))
 		$Output['Content'] = match($this->Editor) {
 			'link'
-			=> Struct\EditorLink::New(
-				$Input['Title'],
-				$Input['Date'],
-				$Input['URL'],
-				$Input['Excerpt'],
-				$Input['Content']
-			),
+			=> Struct\EditorLink::New($Input['Title'], $Input['Date'], $Input['URL'], $Input['Excerpt'], $Input['Content']),
 
 			default
 			=> $Input['Content']
 		};
 
+		// if the post creation date has changed and it was being sorted
+		// by that then update the sort to match.
+
 		if(isset($Input['DateCreated'])) {
-			$Output['TimeCreated'] = Common\Date::FromDateString($Input['DateCreated'])->GetUnixtime();
+			$Output['TimeCreated'] = Common\Date::Unixtime($Input['DateCreated']);
 
 			if($this->TimeCreated === $this->TimeSorted)
-			$Output['TimeSorted'] = $Output['TimeCreated'];
+			$Output['TimeSorted'] = $this->TimeCreated;
+		}
+
+		if($ExtraData) {
+
+			// if there is a source date and we want to sort by that date
+			// instead then update the sort to match.
+
+			if($ExtraData->HasKey('SourceDate')) {
+				if(Common\Filters\Numbers::BoolType($ExtraData->Get('SourceDateSort')))
+				$Output['TimeSorted'] = Common\Date::Unixtime($ExtraData['SourceDate']);
+				else
+				$Output['TimeSorted'] = $this->TimeCreated;
+			}
 		}
 
 		return $Output;
@@ -238,11 +281,13 @@ implements
 		$Output = [
 			'ID'            => $this->ID,
 			'UUID'          => $this->UUID,
+			'Enabled'       => $this->Enabled,
 			'Editor'        => $this->Editor,
 			'Alias'         => $this->Alias,
 			'Title'         => $this->Title,
-			'PageURL'       => $this->GetURL(),
+			'PageURL'       => $this->GetPageURL(),
 			'CoverImageURL' => $this->GetCoverImageURL(),
+			'ExtraData'     => $this->ExtraData->Export(),
 			'Tags'          => $Tags,
 			'Blog'          => $Blog
 		];
@@ -314,10 +359,12 @@ implements
 	////////////////////////////////////////////////////////////////
 
 	public function
-	GetURL():
+	GetPageURL():
 	string {
 
-		return $this->Blog->GetPostURL($this);
+		$URL = $this->Blog->GetPostURL($this);
+
+		return $URL;
 	}
 
 	public function
@@ -846,6 +893,19 @@ implements
 		$Post->UpdateHTML();
 
 		return $Post;
+	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
+	#[Common\Meta\Deprecated('2024-06-24', 'use GetPageURL() instead.')]
+	public function
+	GetURL():
+	string {
+
+		return $this->GetPageURL();
 	}
 
 }
