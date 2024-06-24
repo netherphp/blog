@@ -37,7 +37,7 @@ implements
 		]);
 
 		$App->Plugins->RegisterInterfaceNamespace('Nether\Blog\Plugin\Interfaces');
-		$App->Plugins->Register(Plugins\BlogPostAdminMenuDefault::class);
+		$App->Plugins->Register(Plugins\PostView\AdminMenuDefault::class);
 		$App->Plugins->Register(Plugins\FileUploadHandler::class);
 
 		BlogTagLink::Register();

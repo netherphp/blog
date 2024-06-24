@@ -1,18 +1,18 @@
-<?php
+<?php ##########################################################################
+################################################################################
 
-////////////////////////////////////////////////////////////////////////////////
-namespace Nether\Blog\Plugins; /////////////////////////////////////
+namespace Nether\Blog\Plugins\PostView;
 
 use Nether\Atlantis;
 use Nether\Blog;
 use Nether\Common;
 
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
+################################################################################
+################################################################################
 
-class BlogPostAdminMenuDefault
+class AdminMenuDefault
 extends Atlantis\Plugin
-implements Blog\Plugin\Interfaces\AdminMenuSectionInterface {
+implements Blog\Plugin\Interfaces\PostView\AdminMenuSectionInterface {
 
 	public function
 	GetItemsForSection(Blog\Post $Profile, string $Key, Common\Datastore $ExtraData):
@@ -52,7 +52,7 @@ implements Blog\Plugin\Interfaces\AdminMenuSectionInterface {
 			Title: '# Editing'
 		))
 		->Shove('BlogPostEditEditor', Atlantis\Struct\DropdownItem::New(
-			Title: 'Post Editor',
+			Title: 'Edit Post',
 			Icon: 'mdi-pencil',
 			URL: $Post->GetEditURL(),
 			Attr: $Post->GetDataAttr([ 'blogpost-cmd' => 'edit' ], TRUE)

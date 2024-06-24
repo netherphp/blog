@@ -1,6 +1,6 @@
 <?php
 
-namespace Nether\Blog\Plugin\Interfaces;
+namespace Nether\Blog\Plugin\Interfaces\PostView;
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -11,12 +11,12 @@ use Nether\Common;
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-interface AdminMenuSectionInterface {
+interface AdminMenuAuditInterface {
 
-	#[Common\Meta\Date('2024-01-08')]
-	#[Common\Meta\Info('Return a list of items to add to the specified menu section.')]
+	#[Common\Meta\Date('2024-01-21')]
+	#[Common\Meta\Info('Audit/Manipulate the menu sections after all the plugins add their items.')]
 	public function
-	GetItemsForSection(Blog\Post $Profile, string $Section, Common\Datastore $ExtraData):
-	?Common\Datastore;
+	AuditItems(Blog\Post $Profile, Common\Datastore $Sections, Common\Datastore $ExtraData):
+	void;
 
 };

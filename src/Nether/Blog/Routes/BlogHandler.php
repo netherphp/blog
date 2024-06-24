@@ -1,4 +1,5 @@
-<?php
+<?php ##########################################################################
+################################################################################
 
 namespace Nether\Blog\Routes;
 
@@ -7,8 +8,11 @@ use Nether\Avenue;
 use Nether\Blog;
 use Nether\Common;
 
-use Nether\Blog\Plugin\Interfaces\AdminMenuAuditInterface;
-use Nether\Blog\Plugin\Interfaces\AdminMenuSectionInterface;
+use Nether\Blog\Plugin\Interfaces\PostView\AdminMenuAuditInterface;
+use Nether\Blog\Plugin\Interfaces\PostView\AdminMenuSectionInterface;
+
+################################################################################
+################################################################################
 
 class BlogHandler
 extends Atlantis\PublicWeb {
@@ -149,12 +153,16 @@ extends Atlantis\PublicWeb {
 		))
 		->Area('blog/view', [
 			'Blog'      => $Post->Blog,
+			'BUsr'      => $BlogUser,
 			'Post'      => $Post,
+
+			'AdminMenu' => $AdminMenu,
 			'Photos'    => $PostPhotos,
 			'Videos'    => $PostVideos,
-			'Profiles'  => $PostProfiles,
-			'BlogUser'  => $BlogUser,
-			'AdminMenu' => $AdminMenu
+			'Related'   => $PostProfiles,
+
+			'Profiles'  => $PostProfiles, // @deprecated 2024-06-23
+			'BlogUser'  => $BlogUser      // @deprecated 2024-06-23
 		]);
 
 		return;
@@ -198,6 +206,8 @@ extends Atlantis\PublicWeb {
 
 			return Avenue\Response::CodeRedirectPerm;
 		}
+
+		////////
 
 		$ExtraData['Post'] = $Post;
 

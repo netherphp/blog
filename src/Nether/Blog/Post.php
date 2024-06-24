@@ -324,6 +324,12 @@ implements
 	GetEditURL():
 	string {
 
+		if($this->Editor === 'editorjs')
+		return sprintf(
+			'/dashboard/blog/editor/%s',
+			$this->UUID
+		);
+
 		return sprintf(
 			'/dashboard/blog/edit?id=%d',
 			$this->ID

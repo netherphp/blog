@@ -221,6 +221,7 @@ extends Atlantis\ProtectedWeb {
 	#[Atlantis\Meta\RouteHandler('/dashboard/blog/edit')]
 	#[Atlantis\Meta\RouteAccessTypeUser]
 	#[Avenue\Meta\ConfirmWillAnswerRequest]
+	#[Avenue\Meta\ExtraDataArgs]
 	public function
 	BlogEdit(Blog\Post $Post):
 	void {
