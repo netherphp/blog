@@ -17,8 +17,7 @@ extends Atlantis\ProtectedWeb {
 
 	static public string
 	$BlogDashHome    = 'Blog',
-	$BlogDashHomeURL = '/dashboard/blog',
-	$BlogDashEditor  = 'Block Editor';
+	$BlogDashHomeURL = '/dashboard/blog';
 
 	#[Atlantis\Meta\RouteHandler('/dashboard/blog/editor/:BlogUUID:')]
 	#[Atlantis\Meta\RouteAccessTypeUser]
@@ -28,13 +27,22 @@ extends Atlantis\ProtectedWeb {
 	EditorGet(string $BlogUUID, Blog\Blog $Blog, Blog\BlogUser $BUsr, ?Blog\Post $Post):
 	void {
 
+		$Title = match(TRUE) {
+			($Post instanceof Blog\Post)
+			=> sprintf('Edit Post #%d', $Post->ID),
+
+			default
+			=> 'New Post'
+		};
+
 		$Trail = new Common\Datastore([
 			Atlantis\Struct\Item::New(Title: static::$BlogDashHome, URL: static::$BlogDashHomeURL),
 			Atlantis\Struct\Item::New(Title: $Blog->Title),
-			Atlantis\Struct\Item::New(Title: static::$BlogDashEditor)
+			Atlantis\Struct\Item::New(Title: $Title)
 		]);
 
 		($this->Surface)
+		->Set('Page.Title', sprintf('%s - %s', $Title, $Blog->Title))
 		->Area('blog/dashboard/post-editor', [
 			'BlogUUID' => $BlogUUID,
 			'Trail'    => $Trail,

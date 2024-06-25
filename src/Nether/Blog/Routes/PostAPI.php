@@ -7,6 +7,8 @@ use Nether\Atlantis;
 use Nether\Blog;
 use Nether\Common;
 
+use Exception;
+
 ################################################################################
 ################################################################################
 
@@ -113,8 +115,34 @@ extends Atlantis\ProtectedAPI {
 
 		$Blog = $this->RequireBlogByID($this->Data->BlogID);
 		$BUsr = $this->RequireUserCanWriteBlog($Blog);
+		$Post = NULL;
+		$Err = NULL;
 
-		$this->SetPayload($this->Data->Export());
+		$Data = [
+			'UserID'  => $this->User->ID,
+			'BlogID'  => $this->Data->BlogID,
+			'Editor'  => $this->Data->Editor,
+			'Enabled' => $this->Data->Enabled,
+			'Title'   => $this->Data->Title,
+			'Content' => $this->Data->Content
+		];
+
+		////////
+
+		try {
+			$Post = Blog\Post::Insert($Data);
+		}
+
+		catch(Exception $Err) {
+			$this->Quit(-1, $Err->GetMessage());
+		}
+
+		$Post->UpdateHTML();
+
+		////////
+
+		$this->SetGoto($Post->GetPageURL());
+		$this->SetPayload($Post->DescribeForPublicAPI());
 
 		return;
 	}
@@ -134,8 +162,10 @@ extends Atlantis\ProtectedAPI {
 		$BUsr = $this->RequireUserCanWritePost($Post);
 		$Data = $Post->Patch($this->Data);
 
-		if(count($Data))
-		$Post->Update($Data);
+		if(count($Data)) {
+			$Post->Update($Data);
+			$Post->UpdateHTML();
+		}
 
 		////////
 

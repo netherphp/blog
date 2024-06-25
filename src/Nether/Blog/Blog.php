@@ -13,6 +13,12 @@ use Exception;
 class Blog
 extends Atlantis\Prototype {
 
+	const
+	EntType = 'Blog.Entity';
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
 	#[Database\Meta\TypeChar(Size: 64, Variable: TRUE)]
 	#[Common\Meta\PropertyListable]
 	#[Common\Meta\PropertyPatchable]

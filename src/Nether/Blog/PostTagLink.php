@@ -9,7 +9,7 @@ use Nether\Database;
 class PostTagLink
 extends Atlantis\Tag\EntityLink {
 
-	#[Atlantis\Meta\TagEntityProperty('blogpost')]
+	#[Atlantis\Meta\TagEntityProperty('Blog.Post')]
 	#[Database\Meta\TableJoin('EntityUUID', Extend: TRUE)]
 	public Post
 	$Post;
