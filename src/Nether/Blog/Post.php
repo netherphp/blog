@@ -304,7 +304,7 @@ implements
 
 		$Output = match($this->Editor) {
 			'editorjs'
-			=> $this->GetExcerptFromJSON($Len),
+			=> $this->GetExcerptFromEditorJS($Len),
 
 			'link'
 			=> $this->GetExcerptFromLink($Len),
@@ -317,10 +317,37 @@ implements
 	}
 
 	protected function
-	GetExcerptFromJSON(int $Len=100):
+	GetExcerptFromEditorJS(int $Len=100):
 	string {
 
+		$Content = Common\Struct\EditorJS\Content::FromString(
+			$this->Content
+		);
+
+		$Block = NULL;
+		$Found = NULL;
+
+		foreach($Content->Blocks as $Block) {
+			if($Block instanceof Common\Struct\EditorJS\Blocks\Paragraph) {
+				$Found = $Block;
+				break;
+			}
+		}
+
+		if(!$Found)
 		return '';
+
+		////////
+
+		$Output = preg_replace('#<[Bb][Rr] ?/?>#', ' ', $Found);
+		$Bits = explode(' ', strip_tags($Output), ($Len + 1));
+		$Output = join(' ', array_slice($Bits, 0, $Len));
+
+		if(count($Bits) > $Len)
+		if(!str_ends_with($Output, '.'))
+		$Output .= '...';
+
+		return $Output;
 	}
 
 	protected function
