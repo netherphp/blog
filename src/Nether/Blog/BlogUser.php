@@ -248,6 +248,9 @@ extends Atlantis\Prototype {
 		if($Input['Writer'] !== NULL)
 		$SQL->Where('Main.Writer=:Writer');
 
+		if($Input['Admin'] !== NULL)
+		$SQL->Where('Main.Admin=:Admin');
+
 		return;
 	}
 

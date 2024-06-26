@@ -16,8 +16,54 @@ class PostEditorWeb
 extends Atlantis\ProtectedWeb {
 
 	static public string
-	$BlogDashHome    = 'Blog',
+	$BlogDashHome    = 'Blogs',
 	$BlogDashHomeURL = '/dashboard/blog';
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
+	#[Atlantis\Meta\RouteHandler('/dashboard/blog')]
+	#[Atlantis\Meta\RouteAccessTypeUser]
+	#[Avenue\Meta\ConfirmWillAnswerRequest]
+	#[Avenue\Meta\ExtraDataArgs]
+	public function
+	BlogListGet(Common\Datastore $Blogs):
+	void {
+
+		$Trail = new Common\Datastore([
+			Atlantis\Struct\Item::New(Title: static::$BlogDashHome, URL: static::$BlogDashHomeURL)
+		]);
+
+		($this->Surface)
+		->Set('Page.Title', 'Blogs')
+		->Area('blog/dashboard/blog-list', [
+			'Trail' => $Trail,
+			'Blogs' => $Blogs
+		]);
+
+		return;
+	}
+
+	protected function
+	BlogListGetWillAnswerRequest(Avenue\Struct\ExtraData $Data):
+	int {
+
+		$BlogUsers = Blog\BlogUser::Find([
+			'UserID' => $this->User->ID,
+			'Admin'  => 1
+		]);
+
+		$Blogs = Blog\Blog::Find([
+			'BlogID'=> $BlogUsers->Export()
+		]);
+
+		$Data['Blogs'] = $Blogs;
+
+		return Avenue\Response::CodeOK;
+	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
 
 	#[Atlantis\Meta\RouteHandler('/dashboard/blog/editor/:BlogUUID:')]
 	#[Atlantis\Meta\RouteAccessTypeUser]
@@ -37,7 +83,6 @@ extends Atlantis\ProtectedWeb {
 
 		$Trail = new Common\Datastore([
 			Atlantis\Struct\Item::New(Title: static::$BlogDashHome, URL: static::$BlogDashHomeURL),
-			Atlantis\Struct\Item::New(Title: $Blog->Title),
 			Atlantis\Struct\Item::New(Title: $Title)
 		]);
 

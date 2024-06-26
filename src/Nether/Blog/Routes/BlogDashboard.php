@@ -319,7 +319,7 @@ extends Atlantis\ProtectedWeb {
 		$PageTitle = sprintf('Blog Settings - %s', $Blog->Title);
 
 		$Trail = Common\Datastore::FromArray([
-			Atlantis\Struct\Item::New(UUID: 'blog', Title: 'Blog', URL: '/dashboard/blog'),
+			Atlantis\Struct\Item::New(UUID: 'blog', Title: 'Blogs', URL: '/dashboard/blog'),
 			Atlantis\Struct\Item::New(UUID: 'bsettings', Title: "Settings: {$Blog->Title}")
 		]);
 

@@ -178,7 +178,7 @@ extends Atlantis\Prototype {
 	}
 
 	public function
-	GetURL():
+	GetPageURL():
 	string {
 
 		$Format = Library::Get(Library::ConfBlogURL);
@@ -240,6 +240,14 @@ extends Atlantis\Prototype {
 	GetWriteURL():
 	string {
 
+		$Mode = Library::Get(Key::ConfEditorDefault);
+
+		if($Mode === 'new')
+		return sprintf(
+			'/dashboard/blog/editor/%s',
+			$this->UUID
+		);
+
 		return sprintf(
 			'/dashboard/blog/write?id=%d',
 			$this->ID
@@ -253,6 +261,16 @@ extends Atlantis\Prototype {
 		return sprintf(
 			'/dashboard/blog/settings?id=%d',
 			$this->ID
+		);
+	}
+
+	public function
+	GetManageUsersURL():
+	string {
+
+		return sprintf(
+			'/dashboard/blog/users/%s',
+			$this->UUID
 		);
 	}
 
@@ -403,6 +421,19 @@ extends Atlantis\Prototype {
 		////////
 
 		return parent::Insert($Dataset);
+	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
+	#[Common\Meta\Deprecated('2024-06-26', 'use GetPageURL() instead.')]
+	public function
+	GetURL():
+	string {
+
+		return $this->GetPageURL();
 	}
 
 }
