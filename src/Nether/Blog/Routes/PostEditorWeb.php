@@ -24,6 +24,7 @@ extends Atlantis\ProtectedWeb {
 
 	#[Atlantis\Meta\RouteHandler('/dashboard/blog')]
 	#[Atlantis\Meta\RouteAccessTypeUser]
+	#[Atlantis\Meta\TrafficReportSkip]
 	#[Avenue\Meta\ConfirmWillAnswerRequest]
 	#[Avenue\Meta\ExtraDataArgs]
 	public function
@@ -67,6 +68,7 @@ extends Atlantis\ProtectedWeb {
 
 	#[Atlantis\Meta\RouteHandler('/dashboard/blog/editor/:BlogUUID:')]
 	#[Atlantis\Meta\RouteAccessTypeUser]
+	#[Atlantis\Meta\TrafficReportSkip]
 	#[Avenue\Meta\ConfirmWillAnswerRequest]
 	#[Avenue\Meta\ExtraDataArgs]
 	public function
