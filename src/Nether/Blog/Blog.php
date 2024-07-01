@@ -281,6 +281,14 @@ extends Atlantis\Prototype {
 		if($this->ImageHeader)
 		return $this->ImageHeader->GetPublicURL();
 
+		if($this->ImageHeaderID) {
+			$this->ImageHeader = Atlantis\Media\File::GetByID(
+				$this->ImageHeaderID
+			);
+
+			return $this->ImageHeader->GetPublicURL();
+		}
+
 		return '';
 	}
 
@@ -290,6 +298,14 @@ extends Atlantis\Prototype {
 
 		if($this->ImageIcon)
 		return $this->ImageIcon->GetPublicURL();
+
+		if($this->ImageIconID) {
+			$this->ImageIcon = Atlantis\Media\File::GetByID(
+				$this->ImageIconID
+			);
+
+			return $this->ImageIcon->GetPublicURL();
+		}
 
 		return '';
 	}

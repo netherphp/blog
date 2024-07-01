@@ -254,5 +254,22 @@ extends Atlantis\Prototype {
 		return;
 	}
 
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
+	static public function
+	MapToBlog(self $BUsr):
+	Blog {
+
+		return $BUsr->Blog;
+	}
+
+	static public function
+	MapToUser(self $BUsr):
+	User\Entity {
+
+		return $BUsr->User;
+	}
+
 }
 

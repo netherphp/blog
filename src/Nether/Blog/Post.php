@@ -659,8 +659,12 @@ implements
 
 		parent::FindExtendFilters($SQL, $Input);
 
-		if($Input['BlogID'] !== NULL)
-		$SQL->Where('Main.BlogID=:BlogID');
+		if($Input['BlogID'] !== NULL) {
+			if(is_array($Input['BlogID']))
+			$SQL->Where('Main.BlogID IN(:BlogID)');
+			else
+			$SQL->Where('Main.BlogID=:BlogID');
+		}
 
 		if($Input['Enabled'] !== NULL)
 		$SQL->Where('Main.Enabled=:Enabled');
