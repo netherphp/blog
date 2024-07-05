@@ -423,6 +423,23 @@ implements
 		return NULL;
 	}
 
+	public function
+	GetCoverImageStyleBG():
+	string {
+
+		$URL = $this->GetCoverImageURL();
+
+		////////
+
+		if(!$URL)
+		return '';
+
+		return sprintf(
+			'background-image: url(%s);',
+			$URL
+		);
+	}
+
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
 

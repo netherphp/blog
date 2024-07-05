@@ -293,6 +293,20 @@ extends Atlantis\Prototype {
 	}
 
 	public function
+	GetHeaderStyleBG():
+	string {
+
+		$URL = $this->GetHeaderURL();
+
+		////////
+
+		if(!$URL)
+		return '';
+
+		return sprintf('background-image: url(%s);', $URL);
+	}
+
+	public function
 	GetIconURL():
 	string {
 
@@ -308,6 +322,20 @@ extends Atlantis\Prototype {
 		}
 
 		return '';
+	}
+
+	public function
+	GetIconStyleBG():
+	string {
+
+		$URL = $this->GetIconURL();
+
+		////////
+
+		if(!$URL)
+		return '';
+
+		return sprintf('background-image: url(%s);', $URL);
 	}
 
 	public function

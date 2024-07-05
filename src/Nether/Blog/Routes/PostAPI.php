@@ -109,7 +109,11 @@ extends Atlantis\ProtectedAPI {
 		->Title(Common\Filters\Text::TrimmedNullable(...))
 		->Editor(Common\Filters\Text::TrimmedNullable(...))
 		->Content(Common\Filters\Text::TrimmedNullable(...))
-		->Enabled(Common\Filters\Numbers::IntType(...));
+		->Enabled(Common\Filters\Numbers::IntType(...))
+		->DateCreated([
+			Common\Filters\Text::TrimmedNullable(...),
+			fn(Common\Struct\DatafilterItem $I)=> Common\Date::FromDateString($I->Value ?: 'now')
+		]);
 
 		////////
 
@@ -119,12 +123,13 @@ extends Atlantis\ProtectedAPI {
 		$Err = NULL;
 
 		$Data = [
-			'UserID'  => $this->User->ID,
-			'BlogID'  => $this->Data->BlogID,
-			'Editor'  => $this->Data->Editor,
-			'Enabled' => $this->Data->Enabled,
-			'Title'   => $this->Data->Title,
-			'Content' => $this->Data->Content
+			'UserID'      => $this->User->ID,
+			'BlogID'      => $this->Data->BlogID,
+			'Editor'      => $this->Data->Editor,
+			'Enabled'     => $this->Data->Enabled,
+			'Title'       => $this->Data->Title,
+			'TimeCreated' => $this->Data->DateCreated->GetUnixtime(),
+			'Content'     => $this->Data->Content
 		];
 
 		////////
