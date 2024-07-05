@@ -411,7 +411,7 @@ implements
 	}
 
 	public function
-	GetCoverImageURL(string $Size='md'):
+	GetCoverImageURL(string $Size='lg'):
 	?string {
 
 		if(isset($this->CoverImage))
@@ -424,10 +424,10 @@ implements
 	}
 
 	public function
-	GetCoverImageStyleBG():
+	GetCoverImageStyleBG(string $Size='lg'):
 	string {
 
-		$URL = $this->GetCoverImageURL();
+		$URL = $this->GetCoverImageURL($Size);
 
 		////////
 

@@ -275,11 +275,14 @@ extends Atlantis\Prototype {
 	}
 
 	public function
-	GetHeaderURL():
+	GetHeaderURL(string $Size='lg'):
 	string {
 
 		if($this->ImageHeader)
-		return $this->ImageHeader->GetPublicURL();
+		return str_replace(
+			'original.', "{$Size}.",
+			$this->ImageHeader->GetPublicURL()
+		);
 
 		if($this->ImageHeaderID) {
 			$this->ImageHeader = Atlantis\Media\File::GetByID(
@@ -307,11 +310,14 @@ extends Atlantis\Prototype {
 	}
 
 	public function
-	GetIconURL():
+	GetIconURL(string $Size='md'):
 	string {
 
 		if($this->ImageIcon)
-		return $this->ImageIcon->GetPublicURL();
+		return str_replace(
+			'original.', "{$Size}.",
+			$this->ImageIcon->GetPublicURL()
+		);
 
 		if($this->ImageIconID) {
 			$this->ImageIcon = Atlantis\Media\File::GetByID(
