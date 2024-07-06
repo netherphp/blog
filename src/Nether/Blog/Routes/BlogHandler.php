@@ -7,6 +7,7 @@ use Nether\Atlantis;
 use Nether\Avenue;
 use Nether\Blog;
 use Nether\Common;
+use Nether\Surface;
 
 use Nether\Blog\Plugin\Interfaces\PostView\AdminMenuAuditInterface;
 use Nether\Blog\Plugin\Interfaces\PostView\AdminMenuSectionInterface;
@@ -27,7 +28,8 @@ extends Atlantis\PublicWeb {
 		->Page(Common\Filters\Numbers::Page(...))
 		->Drafts(Common\Filters\Numbers::BoolNullable(...))
 		->Tag(Common\Filters\Text::TrimmedNullable(...))
-		->Q(Common\Filters\Text::TrimmedNullable(...));
+		->Q(Common\Filters\Text::TrimmedNullable(...))
+		->Format(Common\Filters\Text::TrimmedNullable(...));
 
 		$Blog = NULL;
 		$BlogUser = NULL;
@@ -36,6 +38,11 @@ extends Atlantis\PublicWeb {
 
 		$Tag = NULL;
 		$MoreTags = [];
+
+		////////
+
+		if($this->Data->Format === 'rss')
+		array_unshift($this->Surface->Themes, 'rss');
 
 		////////
 
