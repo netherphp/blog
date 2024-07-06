@@ -108,6 +108,7 @@ extends Atlantis\ProtectedAPI {
 		->BlogID(Common\Filters\Numbers::IntType(...))
 		->Title(Common\Filters\Text::TrimmedNullable(...))
 		->Editor(Common\Filters\Text::TrimmedNullable(...))
+		->CoverImageID(Common\Filters\Numbers::IntNullable(...))
 		->Content(Common\Filters\Text::TrimmedNullable(...))
 		->Enabled(Common\Filters\Numbers::IntType(...))
 		->DateCreated([
@@ -123,13 +124,14 @@ extends Atlantis\ProtectedAPI {
 		$Err = NULL;
 
 		$Data = [
-			'UserID'      => $this->User->ID,
-			'BlogID'      => $this->Data->BlogID,
-			'Editor'      => $this->Data->Editor,
-			'Enabled'     => $this->Data->Enabled,
-			'Title'       => $this->Data->Title,
-			'TimeCreated' => $this->Data->DateCreated->GetUnixtime(),
-			'Content'     => $this->Data->Content
+			'UserID'       => $this->User->ID,
+			'BlogID'       => $this->Data->BlogID,
+			'Editor'       => $this->Data->Editor,
+			'Enabled'      => $this->Data->Enabled,
+			'CoverImageID' => $this->Data->CoverImageID,
+			'Title'        => $this->Data->Title,
+			'TimeCreated'  => $this->Data->DateCreated->GetUnixtime(),
+			'Content'      => $this->Data->Content
 		];
 
 		////////
