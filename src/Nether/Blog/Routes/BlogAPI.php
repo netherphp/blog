@@ -165,6 +165,7 @@ extends Atlantis\ProtectedAPI {
 			isset($_FILES['PostPhoto']) ? $_FILES['PostPhoto'] : NULL
 		)
 		->SiteTags(
+			fn(Common\Struct\DatafilterItem $I)=> explode(',', $I->Value),
 			Common\Filters\Lists::ArrayOf(...),
 			Common\Filters\Numbers::IntType(...)
 		);
