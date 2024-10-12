@@ -90,6 +90,7 @@ extends Atlantis\PublicWeb {
 		($this->Surface)
 		->Set('Page.Title', $Blog->Title)
 		->Set('Page.URL', $Blog->GetURL())
+		->Set('Page.FeedURL', new Atlantis\WebURL(sprintf('%s?format=rss', $Blog->GetURL())))
 		->Area('blog/index', [
 			'Blog'          => $Blog,
 			'BlogUser'      => $BlogUser,
@@ -153,6 +154,8 @@ extends Atlantis\PublicWeb {
 		////////
 
 		($this->Surface)
+		->Set('Page.HomeURL', $Post->Blog->GetURL())
+		->Set('Page.FeedURL', new Atlantis\WebURL(sprintf('%s?format=rss', $Post->Blog->GetURL())))
 		->Set('Page.ImageURL', new Atlantis\WebURL($Post->GetCoverImageURL('lg') ?? ''))
 		->Set('Page.Title', sprintf(
 			'%s - %s',
