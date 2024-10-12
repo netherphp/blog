@@ -89,6 +89,7 @@ extends Atlantis\PublicWeb {
 
 		($this->Surface)
 		->Set('Page.Title', $Blog->Title)
+		->Set('Page.URL', $Blog->GetURL())
 		->Area('blog/index', [
 			'Blog'          => $Blog,
 			'BlogUser'      => $BlogUser,
