@@ -11,7 +11,8 @@ use Exception;
 
 #[Database\Meta\TableClass('Blogs', 'BL')]
 class Blog
-extends Atlantis\Prototype {
+extends Atlantis\Prototype
+implements Atlantis\Interfaces\ExtraDataInterface {
 
 	const
 	EntType = 'Blog.Entity';
@@ -98,6 +99,11 @@ extends Atlantis\Prototype {
 	#[Common\Meta\PropertyFilter([ Common\Filters\Numbers::class, 'IntType' ])]
 	public int
 	$OptAdult;
+
+	use
+	Atlantis\Packages\ExtraData;
+
+	////////
 
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////

@@ -83,27 +83,46 @@ extends Atlantis\ProtectedAPI {
 	BlogEntityPatch():
 	void {
 
-		($this->Data)
-		->ID(Common\Filters\Numbers::IntType(...));
+		$Blog = NULL;
+		$BlogUser = NULL;
 
 		////////
+
+		($this->Data)
+		->ID(Common\Filters\Numbers::IntType(...))
+		->ThemeSettings([
+			Common\Filters\Text::Trimmed(...),
+			(fn(Common\Struct\DatafilterItem $I)=> json_decode($I->Value))
+		]);
 
 		if(!$this->Data->ID)
 		$this->Quit(1, 'no ID specified');
 
-		$Blog = Blog\Blog::GetByID($this->Data->ID);
-
-		if(!$Blog)
+		if(!($Blog = Blog\Blog::GetByID($this->Data->ID)))
 		$this->Quit(2, 'blog not found');
 
 		////////
 
-		$BlogUser = Blog\BlogUser::GetByPair($Blog->ID, $this->User->ID);
+		$BlogUser = Blog\BlogUser::GetByPair(
+			$Blog->ID, $this->User->ID
+		);
 
 		if(!$BlogUser || !$BlogUser->CanAdmin())
 		$this->Quit(3, 'user cannot admin this blog');
 
+		////////
+
 		$Blog->Update($Blog->Patch($this->Data));
+
+		// still thinking about really how i want the theme settings to be
+		// done so not hard baking this into a super optimised update atm.
+
+		if($this->Data->ThemeSettings)
+		$Blog->Update($Blog->Patch([
+			'ExtraData' => [
+				'ThemeSettings' => $this->Data->ThemeSettings
+			]
+		]));
 
 		$this->SetGoto($Blog->GetURL());
 
