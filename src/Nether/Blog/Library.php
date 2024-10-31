@@ -28,11 +28,12 @@ implements
 
 		($App->Config)
 		->BlendRight([
-			Key::ConfEnable        => TRUE,
-			Key::ConfStorageKey    => 'Default',
-			Key::ConfBlogURL       => '/+:BlogAlias:',
-			Key::ConfPostURL       => '/+:BlogAlias:/:PostID:/:PostAlias:',
-			Key::ConfEditorDefault => 'html'
+			Key::ConfEnable           => TRUE,
+			Key::ConfStorageKey       => 'Default',
+			Key::ConfBlogURL          => '/+:BlogAlias:',
+			Key::ConfPostURL          => '/+:BlogAlias:/:PostID:/:PostAlias:',
+			Key::ConfEditorDefault    => 'html',
+			Key::ConfIndexUseSiteTags => TRUE
 		]);
 
 		$App->Plugins->RegisterInterfaceNamespace('Nether\Blog\Plugin\Interfaces');

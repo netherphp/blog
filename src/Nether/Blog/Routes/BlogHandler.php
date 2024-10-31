@@ -75,7 +75,8 @@ extends Atlantis\PublicWeb {
 			Page: $this->Data->Page,
 			Drafts: $ShowingDrafts,
 			MoreTags: $MoreTags,
-			SearchTitle: $this->Data->Q
+			SearchTitle: $this->Data->Q,
+			SiteTags: $this->App->Config->IsTrueEnough(Blog\Key::ConfIndexUseSiteTags)
 		);
 
 		// clearly not really the popular posts atm.
