@@ -663,7 +663,8 @@ implements
 		->Define('Schedule', TRUE)
 		->Define('Search', NULL)
 		->Define('SearchTitle', TRUE)
-		->Define('SearchDetails', FALSE);
+		->Define('SearchDetails', FALSE)
+		->Define('DateRange', NULL);
 
 		$Input['TagID'] ??= NULL;
 
@@ -696,6 +697,12 @@ implements
 				$SQL->Where('Main.TimeSorted <= :TimeSortedSchedule');
 				$Input[':TimeSortedSchedule'] = Common\Date::CurrentUnixtime();
 			}
+		}
+
+		if($Input['DateRange'] !== NULL) {
+			$SQL->Where('Main.TimeSorted >= :TimeRangeMin AND Main.TimeSorted <= :TimeRangeMax');
+			$Input[':TimeRangeMin'] = $Input['DateRange'][0];
+			$Input[':TimeRangeMax'] = $Input['DateRange'][1];
 		}
 
 		static::FindExtendFilters_ByTagID($SQL, $Input);
