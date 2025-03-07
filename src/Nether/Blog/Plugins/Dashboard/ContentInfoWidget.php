@@ -64,13 +64,19 @@ implements Atlantis\Plugin\Interfaces\Dashboard\InfoWidgetInterface {
 	Render():
 	string {
 
-		$PostCount = Blog\Post::FindCount([
-			'BlogID'=> (
-				($this->Blogs)
-				->Map(Atlantis\Prototype::MapToID(...))
-				->Export()
-			)
-		]);
+		$PostCount = match(TRUE) {
+			($this->Blogs->Count() > 0)
+			=> Blog\Post::FindCount([
+				'BlogID'=> (
+					($this->Blogs)
+					->Map(Atlantis\Prototype::MapToID(...))
+					->Export()
+				)
+			]),
+
+			default
+			=> 0
+		};
 
 		$Output = (
 			($this->App->Surface)
