@@ -820,7 +820,7 @@ implements
 			));
 
 			if($Input['TagID'] instanceof Common\Datastore)
-			$Input['TagID'] = $Input['TagID']->GetData();
+			$Input['TagID'] = $Input['TagID']->Export();
 
 			return;
 		});
