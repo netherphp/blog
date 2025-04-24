@@ -855,7 +855,13 @@ implements
 					$FieldQA
 				));
 
-				$Input[$FieldQA] = $ID;
+				$Input[$FieldQA] = match(TRUE) {
+					($ID instanceof Atlantis\Tag\Entity)
+					=> $ID->ID,
+
+					default
+					=> $ID
+				};
 			}
 
 			return;
