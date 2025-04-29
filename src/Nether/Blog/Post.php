@@ -444,8 +444,11 @@ implements
 	////////////////////////////////////////////////////////////////
 
 	public function
-	CanUserEdit(BlogUser $Who):
+	CanUserEdit(?BlogUser $Who):
 	bool {
+
+		if(!$Who)
+		return FALSE;
 
 		if($Who->UserID !== $this->UserID)
 		return $Who->CanEdit();
