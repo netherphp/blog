@@ -29,7 +29,8 @@ extends Atlantis\PublicWeb {
 		->Drafts(Common\Filters\Numbers::BoolNullable(...))
 		->Tag(Common\Filters\Text::TrimmedNullable(...))
 		->Q(Common\Filters\Text::TrimmedNullable(...))
-		->Format(Common\Filters\Text::TrimmedNullable(...));
+		->Format(Common\Filters\Text::TrimmedNullable(...))
+		->Date(Common\Filters\Text::TrimmedNullable(...));
 
 		$Blog = NULL;
 		$BlogUser = NULL;
@@ -76,7 +77,8 @@ extends Atlantis\PublicWeb {
 			Drafts: $ShowingDrafts,
 			MoreTags: $MoreTags,
 			SearchTitle: $this->Data->Q,
-			SiteTags: $this->App->Config->IsTrueEnough(Blog\Key::ConfIndexUseSiteTags)
+			SiteTags: $this->App->Config->IsTrueEnough(Blog\Key::ConfIndexUseSiteTags),
+			SearchDate: $this->Data->Date
 		);
 
 		// clearly not really the popular posts atm.

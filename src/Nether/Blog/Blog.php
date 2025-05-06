@@ -157,7 +157,7 @@ implements Atlantis\Interfaces\ExtraDataInterface {
 	}
 
 	public function
-	GetRecentPosts(int $Page=1, int $Limit=10, ?bool $Drafts=FALSE, bool $SiteTags=TRUE, iterable $MoreTags=NULL, ?string $SearchTitle=NULL):
+	GetRecentPosts(int $Page=1, int $Limit=10, ?bool $Drafts=FALSE, bool $SiteTags=TRUE, iterable $MoreTags=NULL, ?string $SearchTitle=NULL, ?string $SearchDate=NULL):
 	Database\ResultSet {
 
 		$Tags = new Common\Datastore;
@@ -175,6 +175,7 @@ implements Atlantis\Interfaces\ExtraDataInterface {
 			'TagID'       => $Tags->Count() ? $Tags : NULL,
 			'BlogID'      => $this->ID,
 			'SearchTitle' => $SearchTitle,
+			'SearchDate'  => $SearchDate,
 			'Enabled'     => $Drafts ? 0 : 1,
 			'Schedule'    => $Drafts ? NULL : TRUE,
 			'Page'        => $Page,

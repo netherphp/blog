@@ -667,6 +667,7 @@ implements
 		->Define('Search', NULL)
 		->Define('SearchTitle', TRUE)
 		->Define('SearchDetails', FALSE)
+		->Define('SearchDate', NULL)
 		->Define('DateRange', NULL);
 
 		$Input['TagID'] ??= NULL;
@@ -710,6 +711,13 @@ implements
 
 		static::FindExtendFilters_ByTagID($SQL, $Input);
 		static::FindExtendFilters_SearchBasicRel($SQL, $Input);
+
+		if($Input['SearchDate'] !== NULL) {
+			$SQL->Where('Main.TimeSorted >= :TimeRangeMin AND Main.TimeSorted < :TimeRangeMax');
+			$SD = Common\Date::FromDateString($Input['SearchDate']);
+			$Input[':TimeRangeMin'] = $SD->Get('U');
+			$Input[':TimeRangeMax'] = $SD->Modify('+1 day')->Get('U');
+		}
 
 		return;
 	}
