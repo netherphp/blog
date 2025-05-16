@@ -231,6 +231,7 @@ extends Atlantis\ProtectedAPI {
 					$this->Data->Title,
 					$this->Data->Date,
 					$this->Data->URL,
+					$this->Data->SiteName,
 					$this->Data->Excerpt,
 					$this->Data->Content
 				),

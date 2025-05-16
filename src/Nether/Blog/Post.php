@@ -214,7 +214,7 @@ implements
 		if(array_key_exists('Content', $Output))
 		$Output['Content'] = match($this->Editor) {
 			'link'
-			=> Struct\EditorLink::New($Input['Title'], $Input['Date'], $Input['URL'], $Input['Excerpt'], $Input['Content']),
+			=> Struct\EditorLink::New($Input['Title'], $Input['Date'], $Input['URL'], $Input['SiteName'], $Input['Excerpt'], $Input['Content']),
 
 			default
 			=> $Input['Content']

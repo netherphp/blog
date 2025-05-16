@@ -33,6 +33,12 @@ implements Stringable {
 	#[Common\Meta\PropertyListable]
 	#[Common\Meta\PropertyPatchable]
 	#[Common\Meta\PropertyFilter([ Common\Filters\Text::class, 'Trimmed' ])]
+	public ?string
+	$SiteName = NULL;
+
+	#[Common\Meta\PropertyListable]
+	#[Common\Meta\PropertyPatchable]
+	#[Common\Meta\PropertyFilter([ Common\Filters\Text::class, 'Trimmed' ])]
 	public string
 	$Excerpt;
 
@@ -117,7 +123,7 @@ implements Stringable {
 	////////////////////////////////////////////////////////////////
 
 	static public function
-	New(string $Title=NULL, string $Date=NULL, string $URL=NULL, string $Excerpt=NULL, string $Content=NULL):
+	New(string $Title=NULL, string $Date=NULL, string $URL=NULL, ?string $SiteName=NULL, string $Excerpt=NULL, string $Content=NULL):
 	static {
 
 		$Props = Common\Meta\PropertyPatchable::FromClass(static::class);
@@ -134,11 +140,12 @@ implements Stringable {
 		////////
 
 		return new static([
-			'Title'   => $Title,
-			'Date'    => $Date,
-			'URL'     => $URL,
-			'Excerpt' => $Excerpt,
-			'Content' => $Content
+			'Title'    => $Title,
+			'Date'     => $Date,
+			'URL'      => $URL,
+			'SiteName' => $SiteName,
+			'Excerpt'  => $Excerpt,
+			'Content'  => $Content
 		]);
 	}
 
