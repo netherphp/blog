@@ -56,6 +56,12 @@ implements Blog\Plugin\Interfaces\PostView\AdminMenuSectionInterface {
 			Icon: 'mdi-pencil',
 			URL: $Post->GetEditURL(),
 			Attr: $Post->GetDataAttr([ 'blogpost-cmd' => 'edit' ], TRUE)
+		))
+		->Shove('BlogPostAdminNotes', Atlantis\Struct\DropdownItem::New(
+			Title: 'Edit Admin Notes',
+			Icon: 'mdi-pencil',
+			URL: '#',
+			Attr: $Post->GetDataAttr([ 'post-cmd' => 'adminnotes' ], TRUE)
 		));
 
 		////////
