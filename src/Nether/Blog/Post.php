@@ -386,6 +386,28 @@ implements
 	////////////////////////////////////////////////////////////////
 
 	public function
+	GetEditorObject():
+	mixed {
+
+		if($this->Editor === 'link')
+		return $this->GetEditorObjectLink();
+
+		////////
+
+		return NULL;
+	}
+
+	protected function
+	GetEditorObjectLink():
+	Struct\EditorLink {
+
+		return Struct\EditorLink::FromJSON($this->Content);
+	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
+	public function
 	GetPageURL():
 	string {
 
