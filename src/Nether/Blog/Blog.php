@@ -176,7 +176,7 @@ implements Atlantis\Interfaces\ExtraDataInterface {
 			'BlogID'      => $this->ID,
 			'SearchTitle' => $SearchTitle,
 			'SearchDate'  => $SearchDate,
-			'Enabled'     => $Drafts === NULL ? $Drafts : (int)$Drafts,
+			'Enabled'     => TRUE,
 			'Schedule'    => $Drafts ? NULL : TRUE,
 			'Page'        => $Page,
 			'Limit'       => $Limit,
