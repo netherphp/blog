@@ -171,12 +171,21 @@ implements Atlantis\Interfaces\ExtraDataInterface {
 			$Tags->MergeLeft($MoreTags);
 		}
 
+		////////
+
+		$Enabled = TRUE;
+
+		if($Drafts === TRUE)
+		$Enabled = FALSE;
+
+		////////
+
 		return Post::Find([
 			'TagID'       => $Tags->Count() ? $Tags : NULL,
 			'BlogID'      => $this->ID,
 			'SearchTitle' => $SearchTitle,
 			'SearchDate'  => $SearchDate,
-			'Enabled'     => TRUE,
+			'Enabled'     => $Enabled,
 			'Schedule'    => $Drafts ? NULL : TRUE,
 			'Page'        => $Page,
 			'Limit'       => $Limit,
