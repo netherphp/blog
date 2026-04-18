@@ -24,6 +24,11 @@ implements
 	const
 	EntType = 'Blog.Post';
 
+	const
+	StatusDraft     = 0,
+	StatusPublish   = 1,
+	StatusQuickLink = 2;
+
 	use
 	Atlantis\Packages\CoverImage {
 		HasCoverImage        as HasPostImage;
@@ -299,6 +304,13 @@ implements
 	////////////////////////////////////////////////////////////////
 
 	public function
+	IsEnabled():
+	bool {
+
+		return $this->Enabled !== 0;
+	}
+
+	public function
 	GetExcerpt(int $Len=100):
 	string {
 
@@ -410,6 +422,11 @@ implements
 	public function
 	GetPageURL():
 	string {
+
+		if($this->Enabled === 2) {
+			$EO = $this->GetEditorObject();
+			return $EO->URL;
+		}
 
 		$URL = $this->Blog->GetPostURL($this);
 
@@ -710,8 +727,15 @@ implements
 			$SQL->Where('Main.BlogID=:BlogID');
 		}
 
-		if($Input['Enabled'] !== NULL)
-		$SQL->Where('Main.Enabled=:Enabled');
+		if($Input['Enabled'] !== NULL) {
+			if($Input['Enabled'] === TRUE) {
+				$SQL->Where('Main.Enabled=1 OR Main.Enabled=2');
+			}
+
+			else {
+				$SQL->Where('Main.Enabled=:Enabled');
+			}
+		}
 
 		//if($Input['SearchTitle'] !== NULL) {
 		//	$Input['LikeSearchTitle'] = "%{$Input['SearchTitle']}%";
