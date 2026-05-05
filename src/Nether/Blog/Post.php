@@ -428,6 +428,15 @@ implements
 			return $EO->URL;
 		}
 
+		$URL = $this->GetLocalURL();
+
+		return $URL;
+	}
+
+	public function
+	GetLocalURL():
+	string {
+
 		$URL = $this->Blog->GetPostURL($this);
 
 		return $URL;
