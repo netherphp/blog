@@ -290,7 +290,7 @@ implements
 			'Editor'        => $this->Editor,
 			'Alias'         => $this->Alias,
 			'Title'         => $this->Title,
-			'PageURL'       => $this->GetPageURL(),
+			'PageURL'       => $this->GetLocalURL(),
 			'CoverImageURL' => $this->GetCoverImageURL(),
 			'ExtraData'     => $this->ExtraData->Export(),
 			'Tags'          => $Tags,
