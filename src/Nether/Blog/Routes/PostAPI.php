@@ -148,7 +148,7 @@ extends Atlantis\ProtectedAPI {
 
 		////////
 
-		$this->SetGoto($Post->GetPageURL());
+		$this->SetGoto($Post->GetLocalURL());
 		$this->SetPayload($Post->DescribeForPublicAPI());
 
 		return;
