@@ -304,7 +304,7 @@ extends Atlantis\ProtectedAPI {
 		}
 
 		$this->SetPayload($Post->DescribeForPublicAPI());
-		$this->SetGoto($Post->GetURL());
+		$this->SetGoto($Post->GetLocalURL());
 
 		return;
 	}
@@ -439,7 +439,7 @@ extends Atlantis\ProtectedAPI {
 
 		////////
 
-		$this->SetGoto($Post->GetURL());
+		$this->SetGoto($Post->GetLocalURL());
 		return;
 	}
 
