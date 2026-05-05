@@ -177,6 +177,7 @@ extends Atlantis\ProtectedAPI {
 		////////
 
 		$Post = $this->RequirePostByID($this->Data->ID);
+		$this->SetGoto($Post->GetLocalURL());
 		$this->SetPayload($Post->DescribeForPublicAPI());
 
 		return;
